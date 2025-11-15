@@ -1,40 +1,59 @@
 function App() {
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-zinc-950 via-black to-zinc-900">
-      {/* Subtle grid pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]"></div>
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-zinc-950 via-neutral-900 to-zinc-950 flex flex-col">
       
-      {/* Main Content */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12">
-        
-        {/* Hero Section */}
-        <div className="w-full max-w-6xl mx-auto text-center mb-12">
-          <h1 className="text-8xl md:text-9xl lg:text-[12rem] font-black tracking-tight text-white mb-8 leading-none drop-shadow-2xl">
-            COMING<br/>SOON
-          </h1>
-          <div className="h-1 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-8"></div>
-          <p className="text-2xl md:text-3xl font-light tracking-widest text-gray-300 mb-3">
-            PREMIUM KNIVES
-          </p>
-          <p className="text-lg md:text-xl text-gray-500 tracking-wide">
-            Crafted for Precision. Built for Excellence.
-          </p>
-        </div>
+      {/* Logo at Top Center */}
+      <div className="w-full flex justify-center pt-8 md:pt-12 mb-auto">
+        <img 
+          src="/logo.png" 
+          alt="Sharp Lab by Owais" 
+          className="h-20 md:h-28 w-auto"
+        />
+      </div>
 
-        {/* Small Knife Image */}
-        <div className="w-full max-w-md mx-auto">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-            <div className="relative bg-zinc-900/50 backdrop-blur-sm rounded-lg p-6 border border-zinc-800">
+      {/* Main Content - Left Text, Right Image */}
+      <div className="flex-1 flex items-center justify-center px-6 md:px-12 lg:px-20 py-12">
+        <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          {/* Left Side - Text Content */}
+          <div className="space-y-6 text-center lg:text-left">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight">
+              Coming<br/>
+              <span className="text-orange-600">Soon</span>
+            </h1>
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed">
+              Excellence in craftsmanship. Premium butcher and chef knives that redefine precision.
+            </p>
+            <div className="flex items-center gap-4 justify-center lg:justify-start pt-4">
+              <div className="h-px w-12 bg-orange-600"></div>
+              <p className="text-sm md:text-base text-gray-500 uppercase tracking-wider">
+                Launching Soon
+              </p>
+              <div className="h-px w-12 bg-orange-600"></div>
+            </div>
+          </div>
+
+          {/* Right Side - Knife Image */}
+          <div className="relative">
+            <div className="relative bg-black/40 backdrop-blur-sm rounded-lg p-6 md:p-8 border border-zinc-800">
               <img 
-                src="/knives-bg.jpg" 
+                src="/knives-pic.jpg" 
                 alt="Premium Knife" 
                 className="w-full h-auto object-contain"
               />
             </div>
           </div>
+
         </div>
       </div>
+
+      {/* Bottom Brand Name */}
+      <div className="w-full text-center pb-8 md:pb-12 mt-auto">
+        <p className="text-base md:text-lg text-gray-500">
+          Sharp Lab by <span className="text-orange-600 font-semibold">OWAIS</span>
+        </p>
+      </div>
+
     </div>
   );
 }
