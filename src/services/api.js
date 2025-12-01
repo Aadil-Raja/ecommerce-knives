@@ -27,4 +27,21 @@ export const api = {
     const response = await fetch(`${API_BASE_URL}/products?category_id=${categoryId}`);
     return response.json();
   },
+
+  // Orders
+  createOrder: async (orderData) => {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+    return response.json();
+  },
+
+  getOrderByNumber: async (orderNumber) => {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderNumber}`);
+    return response.json();
+  },
 };

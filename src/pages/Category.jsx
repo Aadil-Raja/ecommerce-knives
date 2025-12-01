@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -28,10 +28,10 @@ function Category() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-gray-400 text-xl">Loading...</p>
+          <p className="text-gray-600 text-xl">Loading...</p>
         </main>
         <Footer />
       </div>
@@ -39,43 +39,45 @@ function Category() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       
       <main className="flex-1 py-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-5xl font-bold text-white mb-4">{category?.name || 'Category'}</h1>
-          <p className="text-xl text-gray-400 mb-12">{category?.description}</p>
+          <h1 className="text-5xl font-bold text-gray-900 mb-4 text-center uppercase tracking-wide">{category?.name || 'Category'}</h1>
+          <p className="text-xl text-gray-600 mb-12 text-center">{category?.description}</p>
           
           {products.length === 0 ? (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-12 text-center">
-              <p className="text-gray-400 text-lg">
+            <div className="bg-white border border-gray-200 rounded p-12 text-center">
+              <p className="text-gray-600 text-lg">
                 No products available in this category yet.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (
-                <div key={product.id} className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-orange-600 transition-colors">
-                  <div className="aspect-square bg-zinc-800 flex items-center justify-center">
+                <Link 
+                  key={product.id} 
+                  to={`/product/${product.id}`}
+                  className="bg-white border border-gray-200 rounded overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                >
+                  <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                     <img 
                       src={`/${product.image_name}`} 
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         e.target.src = '/knives-bg.jpg';
                       }}
                     />
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">{product.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-orange-600">${product.price}</span>
-                      <span className="text-sm text-gray-500">Stock: {product.stock}</span>
+                  <div className="p-4 text-center">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
+                    <div className="flex items-center justify-center">
+                      <span className="text-lg font-bold text-orange-600">RS {product.price} PKR</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

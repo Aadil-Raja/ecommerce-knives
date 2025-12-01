@@ -22,7 +22,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       
       <main className="flex-1">
@@ -41,7 +41,7 @@ function Home() {
             <p className="text-2xl md:text-3xl text-gray-200 mb-8 font-light tracking-wide drop-shadow-lg">
               Premium Knives. Crafted for Precision.
             </p>
-            <button className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors shadow-xl">
+            <button className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded font-bold text-lg transition-colors shadow-xl">
               Explore Collection
             </button>
           </div>
@@ -49,36 +49,33 @@ function Home() {
 
         {/* Featured Products */}
         {featuredProducts.length > 0 && (
-          <section className="py-20 px-6 bg-zinc-900/50">
+          <section className="py-20 px-6 bg-white">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-4xl font-bold text-white text-center mb-12">Featured Products</h2>
+              <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">Featured Products</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {featuredProducts.map((product) => (
-                  <div key={product.id} className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-orange-600 transition-colors">
-                    <div className="aspect-square bg-zinc-800 flex items-center justify-center">
+                  <Link 
+                    key={product.id} 
+                    to={`/product/${product.id}`}
+                    className="bg-white border border-gray-200 rounded overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                  >
+                    <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                       <img 
                         src={`/${product.image_name}`} 
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           e.target.src = '/knives-bg.jpg';
                         }}
                       />
                     </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
-                      <p className="text-gray-400 text-sm mb-4 line-clamp-2">{product.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-orange-600">${product.price}</span>
-                        <Link 
-                          to={`/category/${product.category_slug}`}
-                          className="text-sm text-gray-400 hover:text-white transition-colors"
-                        >
-                          View Category →
-                        </Link>
+                    <div className="p-6 text-center">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
+                      <div className="flex items-center justify-center">
+                        <span className="text-2xl font-bold text-orange-600">RS {product.price} PKR</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -86,25 +83,25 @@ function Home() {
         )}
 
         {/* Features Section */}
-        <section className="py-20 px-6">
+        <section className="py-20 px-6 bg-gray-800">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-4xl font-bold text-white text-center mb-12">Why Choose Sharp Lab</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-zinc-900 p-8 rounded-lg border border-zinc-800">
+              <div className="bg-gray-700 p-8 rounded">
                 <h3 className="text-xl font-semibold text-white mb-4">Premium Quality</h3>
-                <p className="text-gray-400">
+                <p className="text-gray-300">
                   Each knife is crafted with the finest materials and precision engineering for exceptional performance.
                 </p>
               </div>
-              <div className="bg-zinc-900 p-8 rounded-lg border border-zinc-800">
+              <div className="bg-gray-700 p-8 rounded">
                 <h3 className="text-xl font-semibold text-white mb-4">Expert Craftsmanship</h3>
-                <p className="text-gray-400">
+                <p className="text-gray-300">
                   Years of experience and dedication go into every blade, ensuring unmatched quality and durability.
                 </p>
               </div>
-              <div className="bg-zinc-900 p-8 rounded-lg border border-zinc-800">
+              <div className="bg-gray-700 p-8 rounded">
                 <h3 className="text-xl font-semibold text-white mb-4">Lifetime Warranty</h3>
-                <p className="text-gray-400">
+                <p className="text-gray-300">
                   We stand behind our products with a comprehensive lifetime warranty on all our knives.
                 </p>
               </div>
