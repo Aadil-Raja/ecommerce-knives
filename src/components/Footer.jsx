@@ -28,11 +28,6 @@ function Footer() {
                   About Us
                 </Link>
               </li>
-              <li>
-                <Link to="/category/chef-knives" className="text-gray-400 hover:text-white transition-colors text-sm">
-                  Shop Knives
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -41,7 +36,7 @@ function Footer() {
             <h3 className="text-white font-semibold mb-4 uppercase tracking-wider text-sm">Contact</h3>
             <ul className="space-y-2 text-gray-400 text-sm">
               <li>Email: info@sharplabbyowais.com</li>
-              <li>Phone: +1 (555) 123-4567</li>
+              <li>Phone: +92-312-1078541</li>
             </ul>
           </div>
         </div>

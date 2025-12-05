@@ -10,9 +10,11 @@ function ProductDetail() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -20,6 +22,23 @@ function ProductDetail() {
       try {
         const data = await api.getProductById(productId);
         setProduct(data);
+        
+        // Preload all images
+        const imagesToLoad = data.all_images && data.all_images.length > 0 
+          ? data.all_images 
+          : [data.main_image || data.image_name];
+        
+        const imagePromises = imagesToLoad.map(imgPath => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve(); // Resolve even on error to not block loading
+            img.src = `/${imgPath}`;
+          });
+        });
+        
+        await Promise.all(imagePromises);
+        setImagesLoaded(true);
       } catch (error) {
         console.error('Error fetching product:', error);
       } finally {
@@ -30,12 +49,15 @@ function ProductDetail() {
     fetchProduct();
   }, [productId]);
 
-  if (loading) {
+  if (loading || !imagesLoaded) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-gray-400 text-xl">Loading...</p>
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
+            <p className="text-gray-600 text-xl">Loading product...</p>
+          </div>
         </main>
         <Footer />
       </div>
@@ -54,10 +76,10 @@ function ProductDetail() {
     );
   }
 
-  // Use product images array if available, otherwise fallback to single image
-  const productImages = product.images && product.images.length > 0 
-    ? product.images 
-    : [product.image_name, product.image_name, product.image_name, product.image_name, product.image_name, product.image_name];
+  // Use all_images from backend, fallback to main_image or image_name
+  const productImages = product.all_images && product.all_images.length > 0 
+    ? product.all_images 
+    : [product.main_image || product.image_name];
 
   const scrollToImage = (index) => {
     setSelectedImage(index);
@@ -77,12 +99,12 @@ function ProductDetail() {
             {/* Left side - Images */}
             <div className="flex gap-4">
               {/* Thumbnail column */}
-              <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              <div className="flex flex-col gap-3 max-h-[800px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 {productImages.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => scrollToImage(index)}
-                    className={`w-20 h-20 flex-shrink-0 border-2 rounded overflow-hidden transition-all ${
+                    className={`w-24 h-24 flex-shrink-0 border-2 rounded overflow-hidden transition-all ${
                       selectedImage === index 
                         ? 'border-orange-500' 
                         : 'border-gray-300 hover:border-gray-400'
@@ -101,17 +123,18 @@ function ProductDetail() {
               </div>
 
               {/* Main images - scrollable */}
-              <div className="flex-1 max-h-[600px] overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              <div className="flex-1 max-h-[800px] overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 {productImages.map((img, index) => (
                   <div 
                     key={index}
                     id={`product-image-${index}`}
-                    className="bg-white border border-gray-200 rounded overflow-hidden"
+                    className="bg-white border border-gray-200 rounded overflow-hidden cursor-pointer"
+                    onClick={() => setFullscreenImage(img)}
                   >
                     <img 
                       src={`/${img}`} 
                       alt={`${product.name} angle ${index + 1}`}
-                      className="w-full h-auto object-cover"
+                      className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
                       onError={(e) => {
                         e.target.src = '/knives-bg.jpg';
                       }}
@@ -141,32 +164,65 @@ function ProductDetail() {
                 </p>
 
                 {/* Product specifications */}
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-700">Blade Length: 11.5 inches</span>
+                {product.specifications && (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Product Specifications</h3>
+                    
+                    {product.specifications.blade_lengths && (
+                      <div className="flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        <span className="text-gray-700">
+                          Blade Length: {product.specifications.blade_lengths.join(', ')}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {product.specifications.handle_lengths && (
+                      <div className="flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        <span className="text-gray-700">
+                          Handle Length: {product.specifications.handle_lengths.join(', ')}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {product.specifications.blade_material && (
+                      <div className="flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        <span className="text-gray-700">
+                          Blade Material: {product.specifications.blade_material}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {product.specifications.handle_material && (
+                      <div className="flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        <span className="text-gray-700">
+                          Handle Material: {product.specifications.handle_material}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {product.specifications.weight && (
+                      <div className="flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        <span className="text-gray-700">
+                          Weight: {product.specifications.weight}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {product.specifications.includes && (
+                      <div className="flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        <span className="text-gray-700">
+                          Includes: {product.specifications.includes}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-700">Total Length: 17.5 inches</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-700">Blade Material: High-Quality J2 Steel</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-700">Handle Material: Premium Composite or Natural Wood (customizable options)</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-700">Weight: 410 g (approx.)</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-700">leather cover and box.</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               <div className="mt-auto">
@@ -234,6 +290,30 @@ function ProductDetail() {
       </main>
 
       <Footer />
+
+      {/* Fullscreen Image Modal */}
+      {fullscreenImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4"
+          onClick={() => setFullscreenImage(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white text-5xl hover:text-gray-300 transition-colors"
+            onClick={() => setFullscreenImage(null)}
+          >
+            ×
+          </button>
+          <img 
+            src={`/${fullscreenImage}`} 
+            alt={product.name}
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-4 text-white text-sm bg-black bg-opacity-50 px-4 py-2 rounded">
+            Click outside to close
+          </div>
+        </div>
+      )}
     </div>
   );
 }

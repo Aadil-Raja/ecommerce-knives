@@ -1,6 +1,21 @@
 from config.database import get_db_connection
+from utils.image_helper import get_product_images
 
 class Product:
+    @staticmethod
+    def _add_images_to_product(product):
+        """Add image information to a product dict"""
+        if product and product.get('image_name'):
+            images = get_product_images(product['image_name'])
+            product['main_image'] = images['main_image']
+            product['all_images'] = images['all_images']
+        return product
+    
+    @staticmethod
+    def _add_images_to_products(products):
+        """Add image information to a list of product dicts"""
+        return [Product._add_images_to_product(dict(p)) for p in products]
+    
     @staticmethod
     def get_all():
         conn = get_db_connection()
@@ -14,7 +29,7 @@ class Product:
         products = cur.fetchall()
         cur.close()
         conn.close()
-        return products
+        return Product._add_images_to_products(products)
 
     @staticmethod
     def get_by_id(product_id):
@@ -29,7 +44,10 @@ class Product:
         product = cur.fetchone()
         cur.close()
         conn.close()
-        return product
+        if product:
+            product = dict(product)
+            return Product._add_images_to_product(product)
+        return None
 
     @staticmethod
     def get_by_category(category_id):
@@ -45,4 +63,4 @@ class Product:
         products = cur.fetchall()
         cur.close()
         conn.close()
-        return products
+        return Product._add_images_to_products(products)

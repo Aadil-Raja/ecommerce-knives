@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS products (
     images TEXT[], -- Array of image filenames for multiple angles
     stock INTEGER DEFAULT 0,
     is_featured BOOLEAN DEFAULT FALSE,
+    specifications JSONB, -- Store product specifications as JSON
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -73,14 +74,8 @@ INSERT INTO categories (name, slug, description) VALUES
 ('Hunting Knives', 'hunting-knives', 'Durable hunting knives designed for field dressing and outdoor use.')
 ON CONFLICT (slug) DO NOTHING;
 
--- Sample Products
-INSERT INTO products (name, description, price, category_id, image_name, stock, is_featured) VALUES
-('Professional Chef Knife 8"', 'Premium 8-inch chef knife with high-carbon stainless steel blade. Perfect balance and razor-sharp edge.', 149.99, 1, 'chef-knife-1.jpg', 15, true),
-('Santoku Chef Knife 7"', 'Japanese-style Santoku knife with Granton edge. Ideal for slicing, dicing, and mincing.', 129.99, 1, 'chef-knife-2.jpg', 20, false),
-('Butcher Cleaver 10"', 'Heavy-duty cleaver for breaking down large cuts. Full tang construction for maximum durability.', 179.99, 2, 'butcher-knife-1.jpg', 10, true),
-('Boning Knife 6"', 'Flexible boning knife for precise meat preparation. Ergonomic handle for comfort.', 89.99, 2, 'butcher-knife-2.jpg', 25, false),
-('Utility Knife 5"', 'Versatile utility knife for everyday kitchen tasks. Comfortable grip and sharp edge.', 69.99, 3, 'kitchen-knife-1.jpg', 30, false),
-('Paring Knife 3.5"', 'Small paring knife for detailed work. Perfect for peeling and trimming.', 49.99, 3, 'kitchen-knife-2.jpg', 40, false),
-('Fixed Blade Hunter 5"', 'Full tang hunting knife with leather sheath. Built for the outdoors.', 159.99, 4, 'hunting-knife-1.jpg', 12, true),
-('Skinning Knife 4"', 'Curved blade skinning knife for field dressing. Durable and reliable.', 119.99, 4, 'hunting-knife-2.jpg', 18, false)
+-- Sample Products (Only Butcher Knife)
+INSERT INTO products (name, description, price, category_id, image_name, stock, is_featured, specifications) VALUES
+('Butcher Knife – Black & White 4 Pcs Set', 'Premium butcher knife set with high-quality J2 steel blades and elegant handles. Includes leather cover for protection.', 15000, 2, 'butcher-knife-set.jpg', 10, true, 
+'{"blade_lengths": ["10 inches", "8 inches", "6.5 inches"], "handle_lengths": ["5.5 inches", "5.5 inches"], "blade_material": "High-Quality J2 Steel", "handle_material": "Acrylic / Resin / Stone / Natural Wood / Sheesham Wood", "weight": "1100g (approx.)", "includes": "Leather cover"}'::jsonb)
 ON CONFLICT DO NOTHING;
