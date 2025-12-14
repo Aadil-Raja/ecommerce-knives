@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
@@ -6,14 +6,32 @@ import { api } from '../services/api';
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   const { cart } = useCart();
 
-  const categories = [
-    { name: 'Chef Knives', path: '/category/chef-knives' },
-    { name: 'Butcher Knives', path: '/category/butcher-knives' },
-    { name: 'Kitchen Knives', path: '/category/kitchen-knives' },
-    { name: 'Hunting Knives', path: '/category/hunting-knives' },
-  ];
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/categories/');
+      const data = await response.json();
+      setCategories(data.map(category => ({
+        name: category.name,
+        path: `/category/${category.slug}`
+      })));
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      // Fallback to hardcoded categories
+      setCategories([
+        { name: 'Chef Knives', path: '/category/chef-knives' },
+        { name: 'Butcher Knives', path: '/category/butcher-knives' },
+        { name: 'Kitchen Knives', path: '/category/kitchen-knives' },
+        { name: 'Hunting Knives', path: '/category/hunting-knives' },
+      ]);
+    }
+  };
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">

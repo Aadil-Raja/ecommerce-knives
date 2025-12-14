@@ -24,7 +24,9 @@ function ProductDetail() {
         setProduct(data);
         
         // Preload all images
-        const imagesToLoad = data.all_images && data.all_images.length > 0 
+        const imagesToLoad = data.gallery_images && data.gallery_images.length > 0 
+          ? data.gallery_images.map(img => img.image_name)
+          : data.all_images && data.all_images.length > 0 
           ? data.all_images 
           : [data.main_image || data.image_name];
         
@@ -76,8 +78,10 @@ function ProductDetail() {
     );
   }
 
-  // Use all_images from backend, fallback to main_image or image_name
-  const productImages = product.all_images && product.all_images.length > 0 
+  // Use gallery_images from backend if available, fallback to all_images or main_image
+  const productImages = product.gallery_images && product.gallery_images.length > 0 
+    ? product.gallery_images.map(img => img.image_name)
+    : product.all_images && product.all_images.length > 0 
     ? product.all_images 
     : [product.main_image || product.image_name];
 
