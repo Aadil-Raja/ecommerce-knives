@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { api } from '../services/api';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +21,7 @@ function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src="/logo.png" alt="Sharp Lab by Owais" className="h-12 w-auto brightness-0" />
+            <img src={api.getImageUrl('logo.png')} alt="Sharp Lab by Owais" className="h-12 w-auto brightness-0" />
           </Link>
 
           {/* Desktop Menu */}

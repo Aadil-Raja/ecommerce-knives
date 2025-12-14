@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { api } from '../services/api';
 
 function BannerSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const slides = [
-    '/desktop_banner/Untitled-1.jpg',
-    '/desktop_banner/Untitled-2.jpg'
+    api.getImageUrl('desktop_banner/Untitled-1.jpg'),
+    api.getImageUrl('desktop_banner/Untitled-2.jpg')
   ];
 
   useEffect(() => {

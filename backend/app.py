@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -32,6 +32,11 @@ def home():
 @app.route('/api/health')
 def health():
     return {'status': 'ok', 'message': 'API is running'}
+
+# Serve static files (images)
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))

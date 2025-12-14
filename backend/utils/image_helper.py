@@ -6,12 +6,12 @@ def get_product_images(image_folder_path):
     Get all images from a product folder
     Returns a dict with 'main_image' and 'all_images'
     """
-    # Path to public folder (parent of backend)
+    # Path to static folder in backend
     # Normalize the path separators
     normalized_path = image_folder_path.replace('/', os.sep).replace('\\', os.sep)
-    public_path = Path(__file__).parent.parent.parent / 'public' / normalized_path
+    static_path = Path(__file__).parent.parent / 'static' / normalized_path
     
-    if not public_path.exists():
+    if not static_path.exists():
         return {
             'main_image': None,
             'all_images': []
@@ -22,9 +22,9 @@ def get_product_images(image_folder_path):
     all_images = []
     main_image = None
     
-    for file in public_path.iterdir():
+    for file in static_path.iterdir():
         if file.is_file() and file.suffix.lower() in image_extensions:
-            # Construct relative path from public folder using forward slashes for web
+            # Construct relative path from static folder using forward slashes for web
             relative_path = f"{image_folder_path}/{file.name}"
             all_images.append(relative_path)
             

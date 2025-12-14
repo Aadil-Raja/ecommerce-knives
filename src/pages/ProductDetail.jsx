@@ -33,7 +33,7 @@ function ProductDetail() {
             const img = new Image();
             img.onload = () => resolve();
             img.onerror = () => resolve(); // Resolve even on error to not block loading
-            img.src = `/${imgPath}`;
+            img.src = api.getImageUrl(imgPath);
           });
         });
         
@@ -111,11 +111,11 @@ function ProductDetail() {
                     }`}
                   >
                     <img 
-                      src={`/${img}`} 
+                      src={api.getImageUrl(img)} 
                       alt={`${product.name} view ${index + 1}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.src = '/knives-bg.jpg';
+                        e.target.src = api.getImageUrl('knives-bg.jpg');
                       }}
                     />
                   </button>
@@ -132,11 +132,11 @@ function ProductDetail() {
                     onClick={() => setFullscreenImage(img)}
                   >
                     <img 
-                      src={`/${img}`} 
+                      src={api.getImageUrl(img)} 
                       alt={`${product.name} angle ${index + 1}`}
                       className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
                       onError={(e) => {
-                        e.target.src = '/knives-bg.jpg';
+                        e.target.src = api.getImageUrl('knives-bg.jpg');
                       }}
                     />
                   </div>
@@ -304,7 +304,7 @@ function ProductDetail() {
             ×
           </button>
           <img 
-            src={`/${fullscreenImage}`} 
+            src={api.getImageUrl(fullscreenImage)} 
             alt={product.name}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}

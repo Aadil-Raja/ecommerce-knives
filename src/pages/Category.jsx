@@ -83,11 +83,11 @@ function Category() {
                 >
                   <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                     <img 
-                      src={`/${product.main_image || product.image_name}`} 
+                      src={api.getImageUrl(product.main_image || product.image_name)} 
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
-                        e.target.src = '/knives-bg.jpg';
+                        e.target.src = api.getImageUrl('knives-bg.jpg');
                       }}
                     />
                   </div>
