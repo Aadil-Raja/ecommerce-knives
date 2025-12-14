@@ -16,7 +16,7 @@ const ProductImageGallery = ({ images, productName }) => {
       {/* Main Image */}
       <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
         <img
-          src={`http://localhost:5000/${images[selectedImage]?.image_name || images[selectedImage]}`}
+          src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${images[selectedImage]?.image_name || images[selectedImage]}`}
           alt={images[selectedImage]?.alt_text || productName}
           className="w-full h-full object-cover"
         />
@@ -34,7 +34,7 @@ const ProductImageGallery = ({ images, productName }) => {
               }`}
             >
               <img
-                src={`http://localhost:5000/${image?.image_name || image}`}
+                src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${image?.image_name || image}`}
                 alt={image?.alt_text || `${productName} view ${index + 1}`}
                 className="w-full h-full object-cover"
               />

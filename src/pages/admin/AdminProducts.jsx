@@ -167,7 +167,7 @@ const AdminProducts = () => {
                     {product.image_name && (
                       <img
                         className="h-10 w-10 rounded-md object-cover mr-3"
-                        src={`http://localhost:5000/${product.image_name}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${product.image_name}`}
                         alt={product.name}
                       />
                     )}

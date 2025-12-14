@@ -15,7 +15,7 @@ function Navbar() {
 
   const loadCategories = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/categories/');
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api'}/categories/`);
       const data = await response.json();
       setCategories(data.map(category => ({
         name: category.name,

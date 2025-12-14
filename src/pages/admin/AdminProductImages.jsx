@@ -132,7 +132,7 @@ const AdminProductImages = () => {
           <div key={image.id} className="bg-white rounded-lg shadow overflow-hidden">
             <div className="aspect-square bg-gray-100">
               <img
-                src={`http://localhost:5000/${image.image_name}`}
+                src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${image.image_name}`}
                 alt={image.alt_text || 'Product image'}
                 className="w-full h-full object-cover"
               />

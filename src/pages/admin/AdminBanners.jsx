@@ -132,7 +132,7 @@ const AdminBanners = () => {
           <div key={banner.id} className="bg-white rounded-lg shadow overflow-hidden">
             <div className="aspect-w-16 aspect-h-9">
               <img
-                src={`http://localhost:5000/${banner.image_name}`}
+                src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${banner.image_name}`}
                 alt={banner.title}
                 className="w-full h-48 object-cover"
               />
@@ -247,7 +247,7 @@ const AdminBanners = () => {
                   {editingBanner && formData.image_name && (
                     <div className="mt-2">
                       <img
-                        src={`http://localhost:5000/${formData.image_name}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${formData.image_name}`}
                         alt="Current banner"
                         className="w-full h-24 object-cover rounded"
                       />

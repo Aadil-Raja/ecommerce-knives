@@ -12,7 +12,7 @@ function BannerSlider() {
 
   const loadBanners = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/banners/');
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api'}/banners/`);
       const data = await response.json();
       setBanners(data);
     } catch (error) {
@@ -91,7 +91,7 @@ function BannerSlider() {
           }`}
         >
           <img
-            src={`http://localhost:5000/${banner.image_name}`}
+            src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${banner.image_name}`}
             alt={banner.title}
             className="w-full h-full object-contain bg-black"
           />
