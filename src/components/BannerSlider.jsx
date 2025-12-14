@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { getBackendUrl, getImageUrl } from '../utils/config';
 
 function BannerSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -12,7 +12,7 @@ function BannerSlider() {
 
   const loadBanners = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api'}/banners/`);
+      const response = await fetch(`${getBackendUrl()}/banners/`);
       const data = await response.json();
       setBanners(data);
     } catch (error) {
@@ -91,7 +91,7 @@ function BannerSlider() {
           }`}
         >
           <img
-            src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${banner.image_name}`}
+            src={getImageUrl(banner.image_name)}
             alt={banner.title}
             className="w-full h-full object-contain bg-black"
           />

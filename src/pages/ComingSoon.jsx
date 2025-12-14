@@ -1,4 +1,4 @@
-import { api } from '../services/api';
+import { getImageUrl } from '../utils/config';
 
 function ComingSoon() {
   return (
@@ -7,7 +7,7 @@ function ComingSoon() {
       {/* Logo at Top Center */}
       <div className="w-full flex justify-center pt-8 md:pt-12 mb-auto">
         <img 
-          src={api.getImageUrl('logo.png')} 
+          src={getImageUrl('logo.png')} 
           alt="Sharp Lab by Owais" 
           className="h-20 md:h-28 w-auto"
         />
@@ -39,7 +39,7 @@ function ComingSoon() {
           <div className="relative">
             <div className="relative bg-black/40 backdrop-blur-sm rounded-lg p-6 md:p-8 border border-zinc-800">
               <img 
-                src={api.getImageUrl('knives-bg.jpg')} 
+                src={getImageUrl('knives-bg.jpg')} 
                 alt="Premium Knife" 
                 className="w-full h-auto object-contain"
               />

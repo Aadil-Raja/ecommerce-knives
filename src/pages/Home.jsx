@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BannerSlider from '../components/BannerSlider';
 import { api } from '../services/api';
+import { getImageUrl } from '../utils/config';
 
 function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -23,7 +24,7 @@ function Home() {
               const img = new Image();
               img.onload = () => resolve();
               img.onerror = () => resolve();
-              img.src = api.getImageUrl(product.main_image || product.image_name);
+              img.src = getImageUrl(product.main_image || product.image_name);
             });
           });
           
@@ -65,11 +66,11 @@ function Home() {
                 >
                   <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                     <img 
-                      src={api.getImageUrl(product.main_image || product.image_name)} 
+                      src={getImageUrl(product.main_image || product.image_name)} 
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
-                        e.target.src = api.getImageUrl('knives-bg.jpg');
+                        e.target.src = getImageUrl('knives-bg.jpg');
                       }}
                     />
                   </div>

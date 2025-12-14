@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { adminAPI } from '../../services/adminAPI';
+import { getImageUrl } from '../../utils/config';
 
 const AdminProductImages = () => {
   const { productId } = useParams();
@@ -132,7 +133,7 @@ const AdminProductImages = () => {
           <div key={image.id} className="bg-white rounded-lg shadow overflow-hidden">
             <div className="aspect-square bg-gray-100">
               <img
-                src={`${import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:5000'}/${image.image_name}`}
+                src={getImageUrl(image.image_name)}
                 alt={image.alt_text || 'Product image'}
                 className="w-full h-full object-cover"
               />

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { api } from '../services/api';
+import { getImageUrl } from '../utils/config';
 
 function Footer() {
   return (
@@ -9,7 +9,7 @@ function Footer() {
           
           {/* Brand */}
           <div>
-            <img src={api.getImageUrl('logo.png')} alt="Sharp Lab by Owais" className="h-16 w-auto mb-4" />
+            <img src={getImageUrl('logo.png')} alt="Sharp Lab by Owais" className="h-16 w-auto mb-4" />
             <p className="text-gray-400 text-sm">
               Premium knives crafted for precision. Excellence in every blade.
             </p>

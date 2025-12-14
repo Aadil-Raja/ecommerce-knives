@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
-import { api } from '../services/api';
+import { getImageUrl } from '../utils/config';
 
 function Cart() {
   const { cart, removeFromCart, updateQuantity } = useCart();
@@ -48,11 +48,11 @@ function Cart() {
                     {/* Product Image */}
                     <div className="w-24 h-24 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                       <img
-                        src={api.getImageUrl(item.image)}
+                        src={getImageUrl(item.image)}
                         alt={item.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.target.src = api.getImageUrl('knives-bg.jpg');
+                          e.target.src = getImageUrl('knives-bg.jpg');
                         }}
                       />
                     </div>

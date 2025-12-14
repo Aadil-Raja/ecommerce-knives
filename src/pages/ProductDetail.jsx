@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { getImageUrl } from '../utils/config';
 
 function ProductDetail() {
   const { productId } = useParams();
@@ -35,7 +36,7 @@ function ProductDetail() {
             const img = new Image();
             img.onload = () => resolve();
             img.onerror = () => resolve(); // Resolve even on error to not block loading
-            img.src = api.getImageUrl(imgPath);
+            img.src = getImageUrl(imgPath);
           });
         });
         
@@ -115,11 +116,11 @@ function ProductDetail() {
                     }`}
                   >
                     <img 
-                      src={api.getImageUrl(img)} 
+                      src={getImageUrl(img)} 
                       alt={`${product.name} view ${index + 1}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.src = api.getImageUrl('knives-bg.jpg');
+                        e.target.src = getImageUrl('knives-bg.jpg');
                       }}
                     />
                   </button>
@@ -136,11 +137,11 @@ function ProductDetail() {
                     onClick={() => setFullscreenImage(img)}
                   >
                     <img 
-                      src={api.getImageUrl(img)} 
+                      src={getImageUrl(img)} 
                       alt={`${product.name} angle ${index + 1}`}
                       className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
                       onError={(e) => {
-                        e.target.src = api.getImageUrl('knives-bg.jpg');
+                        e.target.src = getImageUrl('knives-bg.jpg');
                       }}
                     />
                   </div>
@@ -308,7 +309,7 @@ function ProductDetail() {
             ×
           </button>
           <img 
-            src={api.getImageUrl(fullscreenImage)} 
+            src={getImageUrl(fullscreenImage)} 
             alt={product.name}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}

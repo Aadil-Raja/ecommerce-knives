@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { api } from '../services/api';
+import { getBackendUrl, getImageUrl } from '../utils/config';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +15,7 @@ function Navbar() {
 
   const loadCategories = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api'}/categories/`);
+      const response = await fetch(`${getBackendUrl()}/categories/`);
       const data = await response.json();
       setCategories(data.map(category => ({
         name: category.name,
@@ -39,7 +39,7 @@ function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src={api.getImageUrl('logo.png')} alt="Sharp Lab by Owais" className="h-12 w-auto brightness-0" />
+            <img src={getImageUrl('logo.png')} alt="Sharp Lab by Owais" className="h-12 w-auto brightness-0" />
           </Link>
 
           {/* Desktop Menu */}
