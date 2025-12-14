@@ -92,6 +92,34 @@ def seed_database():
             );
         """)
         
+        # Create Banners Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS banners (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(200) NOT NULL,
+                subtitle TEXT,
+                image_name VARCHAR(255) NOT NULL,
+                link_url VARCHAR(500),
+                is_active BOOLEAN DEFAULT TRUE,
+                display_order INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        
+        # Create Product Images Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS product_images (
+                id SERIAL PRIMARY KEY,
+                product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+                image_name VARCHAR(255) NOT NULL,
+                is_main BOOLEAN DEFAULT FALSE,
+                display_order INTEGER DEFAULT 0,
+                alt_text VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        
         # Create indexes
         cur.execute("""
             CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
@@ -108,6 +136,21 @@ def seed_database():
         cur.execute("""
             CREATE INDEX IF NOT EXISTS idx_products_featured ON products(is_featured);
         """)
+        cur.execute("""
+            CREATE INDEX IF NOT EXISTS idx_banners_active ON banners(is_active);
+        """)
+        cur.execute("""
+            CREATE INDEX IF NOT EXISTS idx_banners_order ON banners(display_order);
+        """)
+        cur.execute("""
+            CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id);
+        """)
+        cur.execute("""
+            CREATE INDEX IF NOT EXISTS idx_product_images_main ON product_images(is_main);
+        """)
+        cur.execute("""
+            CREATE INDEX IF NOT EXISTS idx_product_images_order ON product_images(display_order);
+        """)
         
         # Insert Sample Products (Only Butcher Knife) - skip if already exists
         cur.execute("""
@@ -115,6 +158,40 @@ def seed_database():
             SELECT 'Butcher Knife – Black & White 4 Pcs Set', 'Premium butcher knife set with high-quality J2 steel blades and elegant handles. Includes leather cover for protection.', 15000, 2, 'product_images/Butcher', 10, true, 
             '{"blade_lengths": ["10 inches", "8 inches", "6.5 inches"], "handle_lengths": ["5.5 inches", "5.5 inches"], "blade_material": "High-Quality J2 Steel", "handle_material": "Acrylic / Resin / Stone / Natural Wood / Sheesham Wood", "weight": "1100g (approx.)", "includes": "Leather cover"}'::jsonb
             WHERE NOT EXISTS (SELECT 1 FROM products WHERE name = 'Butcher Knife – Black & White 4 Pcs Set');
+        """)
+        
+        # Insert Sample Banners - skip if already exist
+        cur.execute("""
+            INSERT INTO banners (title, subtitle, image_name, is_active, display_order) 
+            SELECT 'Sharp Lab by OWAIS', 'Premium Knives. Crafted for Precision.', 'desktop_banner/Untitled-1.jpg', true, 1
+            WHERE NOT EXISTS (SELECT 1 FROM banners WHERE image_name = 'desktop_banner/Untitled-1.jpg');
+        """)
+        cur.execute("""
+            INSERT INTO banners (title, subtitle, image_name, is_active, display_order) 
+            SELECT 'Sharp Lab by OWAIS', 'Professional Grade Cutlery', 'desktop_banner/Untitled-2.jpg', true, 2
+            WHERE NOT EXISTS (SELECT 1 FROM banners WHERE image_name = 'desktop_banner/Untitled-2.jpg');
+        """)
+        
+        # Insert Sample Product Images for Butcher Knife - skip if already exist
+        cur.execute("""
+            INSERT INTO product_images (product_id, image_name, is_main, display_order, alt_text)
+            SELECT 1, 'product_images/Butcher/BUTCHER-001-4-main.jpg', true, 1, 'Butcher Knife Set - Main View'
+            WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = 1 AND image_name = 'product_images/Butcher/BUTCHER-001-4-main.jpg');
+        """)
+        cur.execute("""
+            INSERT INTO product_images (product_id, image_name, is_main, display_order, alt_text)
+            SELECT 1, 'product_images/Butcher/BUTCHER-001-1.jpg', false, 2, 'Butcher Knife Set - View 1'
+            WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = 1 AND image_name = 'product_images/Butcher/BUTCHER-001-1.jpg');
+        """)
+        cur.execute("""
+            INSERT INTO product_images (product_id, image_name, is_main, display_order, alt_text)
+            SELECT 1, 'product_images/Butcher/BUTCHER-001-2.jpg', false, 3, 'Butcher Knife Set - View 2'
+            WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = 1 AND image_name = 'product_images/Butcher/BUTCHER-001-2.jpg');
+        """)
+        cur.execute("""
+            INSERT INTO product_images (product_id, image_name, is_main, display_order, alt_text)
+            SELECT 1, 'product_images/Butcher/BUTCHER-001-3.jpg', false, 4, 'Butcher Knife Set - View 3'
+            WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = 1 AND image_name = 'product_images/Butcher/BUTCHER-001-3.jpg');
         """)
         
         conn.commit()

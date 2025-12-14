@@ -6,6 +6,8 @@ import os
 from routes.products import products_bp
 from routes.categories import categories_bp
 from routes.orders import orders_bp
+from routes.admin import admin_bp
+from routes.banners import banners_bp
 from database.seeder import seed_database
 
 load_dotenv()
@@ -16,13 +18,18 @@ seed_database()
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
+# Configure session
+app.secret_key = os.getenv('SECRET_KEY', 'your-super-secret-key-for-sessions')
+
 # Simple CORS - allow everything for development
-CORS(app)
+CORS(app, supports_credentials=True)
 
 # Register blueprints
 app.register_blueprint(products_bp, url_prefix='/api/products')
 app.register_blueprint(categories_bp, url_prefix='/api/categories')
 app.register_blueprint(orders_bp, url_prefix='/api/orders')
+app.register_blueprint(admin_bp, url_prefix='/api/admin')
+app.register_blueprint(banners_bp, url_prefix='/api/banners')
 
 @app.route('/')
 def home():

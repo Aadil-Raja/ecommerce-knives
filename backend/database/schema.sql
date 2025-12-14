@@ -23,12 +23,7 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sample Categories
-INSERT INTO categories (name, slug, description) VALUES
-('Chef Knives', 'chef-knives', 'Professional chef knives designed for precision cutting, slicing, and dicing.'),
-('Butcher Knives', 'butcher-knives', 'Heavy-duty butcher knives built for breaking down large cuts of meat.'),
-('Kitchen Knives', 'kitchen-knives', 'Versatile kitchen knives for everyday cooking tasks.'),
-('Hunting Knives', 'hunting-knives', 'Durable hunting knives designed for field dressing and outdoor use.');
+
 
 -- Orders Table
 CREATE TABLE IF NOT EXISTS orders (
@@ -59,12 +54,41 @@ CREATE TABLE IF NOT EXISTS order_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Banners Table
+CREATE TABLE IF NOT EXISTS banners (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    subtitle TEXT,
+    image_name VARCHAR(255) NOT NULL,
+    link_url VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE,
+    display_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Product Images Table
+CREATE TABLE IF NOT EXISTS product_images (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+    image_name VARCHAR(255) NOT NULL,
+    is_main BOOLEAN DEFAULT FALSE,
+    display_order INTEGER DEFAULT 0,
+    alt_text VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for faster queries
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_featured ON products(is_featured);
+CREATE INDEX IF NOT EXISTS idx_banners_active ON banners(is_active);
+CREATE INDEX IF NOT EXISTS idx_banners_order ON banners(display_order);
+CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_images_main ON product_images(is_main);
+CREATE INDEX IF NOT EXISTS idx_product_images_order ON product_images(display_order);
 
 -- Sample Categories
 INSERT INTO categories (name, slug, description) VALUES
@@ -74,8 +98,17 @@ INSERT INTO categories (name, slug, description) VALUES
 ('Hunting Knives', 'hunting-knives', 'Durable hunting knives designed for field dressing and outdoor use.')
 ON CONFLICT (slug) DO NOTHING;
 
--- Sample Products (Only Butcher Knife)
-INSERT INTO products (name, description, price, category_id, image_name, stock, is_featured, specifications) VALUES
-('Butcher Knife – Black & White 4 Pcs Set', 'Premium butcher knife set with high-quality J2 steel blades and elegant handles. Includes leather cover for protection.', 15000, 2, 'butcher-knife-set.jpg', 10, true, 
-'{"blade_lengths": ["10 inches", "8 inches", "6.5 inches"], "handle_lengths": ["5.5 inches", "5.5 inches"], "blade_material": "High-Quality J2 Steel", "handle_material": "Acrylic / Resin / Stone / Natural Wood / Sheesham Wood", "weight": "1100g (approx.)", "includes": "Leather cover"}'::jsonb)
-ON CONFLICT DO NOTHING;
+-- Sample Products (Only Butcher Knife) - skip if already exists
+INSERT INTO products (name, description, price, category_id, image_name, stock, is_featured, specifications) 
+SELECT 'Butcher Knife – Black & White 4 Pcs Set', 'Premium butcher knife set with high-quality J2 steel blades and elegant handles. Includes leather cover for protection.', 15000, 2, 'product_images/Butcher', 10, true, 
+'{"blade_lengths": ["10 inches", "8 inches", "6.5 inches"], "handle_lengths": ["5.5 inches", "5.5 inches"], "blade_material": "High-Quality J2 Steel", "handle_material": "Acrylic / Resin / Stone / Natural Wood / Sheesham Wood", "weight": "1100g (approx.)", "includes": "Leather cover"}'::jsonb
+WHERE NOT EXISTS (SELECT 1 FROM products WHERE name = 'Butcher Knife – Black & White 4 Pcs Set');
+
+-- Sample Banners - skip if already exist
+INSERT INTO banners (title, subtitle, image_name, is_active, display_order) 
+SELECT 'Sharp Lab by OWAIS', 'Premium Knives. Crafted for Precision.', 'desktop_banner/Untitled-1.jpg', true, 1
+WHERE NOT EXISTS (SELECT 1 FROM banners WHERE image_name = 'desktop_banner/Untitled-1.jpg');
+
+INSERT INTO banners (title, subtitle, image_name, is_active, display_order) 
+SELECT 'Sharp Lab by OWAIS', 'Professional Grade Cutlery', 'desktop_banner/Untitled-2.jpg', true, 2
+WHERE NOT EXISTS (SELECT 1 FROM banners WHERE image_name = 'desktop_banner/Untitled-2.jpg');

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from werkzeug.utils import secure_filename
 
 def get_product_images(image_folder_path):
     """
@@ -43,3 +44,37 @@ def get_product_images(image_folder_path):
         'main_image': main_image,
         'all_images': all_images
     }
+
+def save_uploaded_image(file, filename):
+    """
+    Save an uploaded image file to the static directory
+    Returns the saved filename
+    """
+    # Ensure the static directory exists
+    static_path = Path(__file__).parent.parent / 'static'
+    static_path.mkdir(exist_ok=True)
+    
+    # Secure the filename
+    filename = secure_filename(filename)
+    
+    # Save the file
+    file_path = static_path / filename
+    file.save(str(file_path))
+    
+    return filename
+
+def delete_image_file(filename):
+    """
+    Delete an image file from the static directory
+    """
+    if not filename:
+        return
+        
+    try:
+        static_path = Path(__file__).parent.parent / 'static'
+        file_path = static_path / filename
+        
+        if file_path.exists() and file_path.is_file():
+            file_path.unlink()
+    except Exception as e:
+        print(f"Error deleting image file {filename}: {e}")

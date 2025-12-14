@@ -1,14 +1,31 @@
 from config.database import get_db_connection
 from utils.image_helper import get_product_images
+from models.product_image import ProductImage
 
 class Product:
     @staticmethod
     def _add_images_to_product(product):
         """Add image information to a product dict"""
-        if product and product.get('image_name'):
-            images = get_product_images(product['image_name'])
-            product['main_image'] = images['main_image']
-            product['all_images'] = images['all_images']
+        if product:
+            # Get images from product_images table
+            product_images = ProductImage.get_by_product_id(product['id'])
+            
+            if product_images:
+                # Use images from product_images table
+                main_image = next((img for img in product_images if img['is_main']), product_images[0] if product_images else None)
+                product['main_image'] = main_image['image_name'] if main_image else None
+                product['all_images'] = [img['image_name'] for img in product_images]
+                product['gallery_images'] = product_images
+            elif product.get('image_name'):
+                # Fallback to old image system
+                images = get_product_images(product['image_name'])
+                product['main_image'] = images['main_image']
+                product['all_images'] = images['all_images']
+                product['gallery_images'] = []
+            else:
+                product['main_image'] = None
+                product['all_images'] = []
+                product['gallery_images'] = []
         return product
     
     @staticmethod
