@@ -10,12 +10,13 @@ const AdminProductImages = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
   const [formData, setFormData] = useState({
     is_main: false,
     display_order: 0,
     alt_text: ''
   });
+  const [isMultipleUpload, setIsMultipleUpload] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -40,23 +41,34 @@ const AdminProductImages = () => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!imageFile) return;
+    if (imageFiles.length === 0) return;
 
     setUploading(true);
     try {
-      await adminAPI.addProductImage(
-        productId,
-        imageFile,
-        formData.is_main,
-        formData.display_order,
-        formData.alt_text
-      );
+      if (isMultipleUpload && imageFiles.length > 1) {
+        // Bulk upload multiple images
+        await adminAPI.addProductImagesBulk(
+          productId,
+          imageFiles,
+          formData.is_main,
+          formData.display_order
+        );
+      } else {
+        // Single image upload
+        await adminAPI.addProductImage(
+          productId,
+          imageFiles[0],
+          formData.is_main,
+          formData.display_order,
+          formData.alt_text
+        );
+      }
       
       await loadData();
       resetForm();
     } catch (error) {
-      console.error('Failed to upload image:', error);
-      alert('Failed to upload image: ' + error.message);
+      console.error('Failed to upload image(s):', error);
+      alert('Failed to upload image(s): ' + error.message);
     } finally {
       setUploading(false);
     }
@@ -100,8 +112,15 @@ const AdminProductImages = () => {
       display_order: 0,
       alt_text: ''
     });
-    setImageFile(null);
+    setImageFiles([]);
+    setIsMultipleUpload(false);
     setShowModal(false);
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImageFiles(files);
+    setIsMultipleUpload(files.length > 1);
   };
 
   if (loading) {
@@ -200,29 +219,44 @@ const AdminProductImages = () => {
               
               <form onSubmit={handleUpload} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Image File</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Image File(s)
+                  </label>
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files[0])}
+                    multiple
+                    onChange={handleFileChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
                     required
                   />
+                  {imageFiles.length > 0 && (
+                    <p className="mt-1 text-sm text-gray-600">
+                      {imageFiles.length} file(s) selected
+                      {isMultipleUpload && " (Multiple upload mode)"}
+                    </p>
+                  )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Alt Text</label>
-                  <input
-                    type="text"
-                    value={formData.alt_text}
-                    onChange={(e) => setFormData({...formData, alt_text: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="Description of the image"
-                  />
-                </div>
+                {!isMultipleUpload && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Alt Text</label>
+                      <input
+                        type="text"
+                        value={formData.alt_text}
+                        onChange={(e) => setFormData({...formData, alt_text: e.target.value})}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        placeholder="Description of the image"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Display Order</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Display Order {isMultipleUpload && "(Starting number)"}
+                  </label>
                   <input
                     type="number"
                     value={formData.display_order}
@@ -230,6 +264,11 @@ const AdminProductImages = () => {
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
                     min="0"
                   />
+                  {isMultipleUpload && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Images will be numbered sequentially starting from this number
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center">
@@ -241,9 +280,22 @@ const AdminProductImages = () => {
                     className="mr-2"
                   />
                   <label htmlFor="is_main" className="text-sm font-medium text-gray-700">
-                    Set as main image
+                    {isMultipleUpload ? "Set first image as main" : "Set as main image"}
                   </label>
                 </div>
+
+                {isMultipleUpload && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Multiple Upload Mode:</strong>
+                    </p>
+                    <ul className="text-xs text-blue-700 mt-1 space-y-1">
+                      <li>• Alt text will be skipped for faster upload</li>
+                      <li>• Display order will increment automatically</li>
+                      <li>• Only first image can be set as main</li>
+                    </ul>
+                  </div>
+                )}
 
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
@@ -258,7 +310,10 @@ const AdminProductImages = () => {
                     disabled={uploading}
                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {uploading ? 'Uploading...' : 'Upload'}
+                    {uploading 
+                      ? `Uploading${isMultipleUpload ? ` ${imageFiles.length} images` : ''}...` 
+                      : `Upload ${isMultipleUpload ? `${imageFiles.length} Images` : 'Image'}`
+                    }
                   </button>
                 </div>
               </form>

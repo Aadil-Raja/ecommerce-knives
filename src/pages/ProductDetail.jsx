@@ -22,6 +22,9 @@ function ProductDetail() {
     const fetchProduct = async () => {
       try {
         const data = await api.getProductById(productId);
+        console.log('Product data received:', data);
+        console.log('Specifications:', data.specifications);
+        console.log('Specifications type:', typeof data.specifications);
         setProduct(data);
         
         // Preload all images
@@ -169,63 +172,20 @@ function ProductDetail() {
                 </p>
 
                 {/* Product specifications */}
-                {product.specifications && (
+                {product.specifications && Object.keys(product.specifications).length > 0 && (
                   <div className="space-y-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Product Specifications</h3>
                     
-                    {product.specifications.blade_lengths && (
-                      <div className="flex items-start">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="flex items-start">
                         <span className="text-gray-500 mr-2">•</span>
                         <span className="text-gray-700">
-                          Blade Length: {product.specifications.blade_lengths.join(', ')}
+                          <span className="font-medium">{key}:</span> {
+                            Array.isArray(value) ? value.join(', ') : value
+                          }
                         </span>
                       </div>
-                    )}
-                    
-                    {product.specifications.handle_lengths && (
-                      <div className="flex items-start">
-                        <span className="text-gray-500 mr-2">•</span>
-                        <span className="text-gray-700">
-                          Handle Length: {product.specifications.handle_lengths.join(', ')}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {product.specifications.blade_material && (
-                      <div className="flex items-start">
-                        <span className="text-gray-500 mr-2">•</span>
-                        <span className="text-gray-700">
-                          Blade Material: {product.specifications.blade_material}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {product.specifications.handle_material && (
-                      <div className="flex items-start">
-                        <span className="text-gray-500 mr-2">•</span>
-                        <span className="text-gray-700">
-                          Handle Material: {product.specifications.handle_material}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {product.specifications.weight && (
-                      <div className="flex items-start">
-                        <span className="text-gray-500 mr-2">•</span>
-                        <span className="text-gray-700">
-                          Weight: {product.specifications.weight}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {product.specifications.includes && (
-                      <div className="flex items-start">
-                        <span className="text-gray-500 mr-2">•</span>
-                        <span className="text-gray-700">
-                          Includes: {product.specifications.includes}
-                        </span>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 )}
               </div>

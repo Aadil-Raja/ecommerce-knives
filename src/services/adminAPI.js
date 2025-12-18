@@ -147,7 +147,7 @@ class AdminAPI {
     formData.append('display_order', displayOrder.toString());
     formData.append('alt_text', altText);
 
-    const response = await fetch(`${API_BASE_URL}/admin/products/${productId}/images`, {
+    const response = await fetch(`${API_BASE_URL}/admin/products/${productId}/upload-image`, {
       method: 'POST',
       credentials: 'include',
       body: formData,
@@ -156,6 +156,31 @@ class AdminAPI {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Upload failed');
+    }
+
+    return response.json();
+  }
+
+  async addProductImagesBulk(productId, files, isMain = false, displayOrder = 0) {
+    const formData = new FormData();
+    
+    // Append all files
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    
+    formData.append('is_main', isMain.toString());
+    formData.append('display_order', displayOrder.toString());
+
+    const response = await fetch(`${API_BASE_URL}/admin/products/${productId}/upload-images-bulk`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Bulk upload failed');
     }
 
     return response.json();
@@ -175,9 +200,14 @@ class AdminAPI {
   }
 
   // Image Upload
-  async uploadImage(file) {
+  async uploadImage(file, categoryName = null, productName = null, barcode = null, imageType = 'product') {
     const formData = new FormData();
     formData.append('image', file);
+    formData.append('image_type', imageType);
+    
+    if (categoryName) formData.append('category_name', categoryName);
+    if (productName) formData.append('product_name', productName);
+    if (barcode) formData.append('barcode', barcode);
 
     const response = await fetch(`${API_BASE_URL}/admin/upload-image`, {
       method: 'POST',

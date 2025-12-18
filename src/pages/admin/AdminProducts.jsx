@@ -14,10 +14,12 @@ const AdminProducts = () => {
     description: '',
     price: '',
     category_id: '',
+    barcode: '',
     stock: '',
     is_featured: false,
     specifications: {}
   });
+  const [specifications, setSpecifications] = useState([{ key: '', value: '' }]);
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -49,17 +51,38 @@ const AdminProducts = () => {
       
       // Upload image if selected
       if (imageFile) {
-        const uploadResult = await adminAPI.uploadImage(imageFile);
+        const selectedCategory = categories.find(c => c.id === parseInt(formData.category_id));
+        const uploadResult = await adminAPI.uploadImage(
+          imageFile, 
+          selectedCategory?.name, 
+          formData.name, 
+          formData.barcode,
+          'product'
+        );
         imageName = uploadResult.filename;
       }
+
+      // Convert specifications array to object
+      const specificationsObj = {};
+      specifications.forEach(spec => {
+        if (spec.key.trim() && spec.value.trim()) {
+          specificationsObj[spec.key.trim()] = spec.value.trim();
+        }
+      });
 
       const productData = {
         ...formData,
         image_name: imageName,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
-        category_id: formData.category_id ? parseInt(formData.category_id) : null
+        category_id: formData.category_id ? parseInt(formData.category_id) : null,
+        specifications: specificationsObj
       };
+
+      // Debug logging
+      console.log('Product data being sent:', productData);
+      console.log('Specifications object:', specificationsObj);
+      console.log('Specifications type:', typeof specificationsObj);
 
       if (editingProduct) {
         await adminAPI.updateProduct(editingProduct.id, productData);
@@ -84,11 +107,19 @@ const AdminProducts = () => {
       description: product.description || '',
       price: product.price.toString(),
       category_id: product.category_id?.toString() || '',
+      barcode: product.barcode || '',
       stock: product.stock?.toString() || '0',
       is_featured: product.is_featured || false,
       image_name: product.image_name || '',
       specifications: product.specifications || {}
     });
+    
+    // Convert specifications object to array for editing
+    const specsArray = Object.entries(product.specifications || {}).map(([key, value]) => ({
+      key,
+      value: value.toString()
+    }));
+    setSpecifications(specsArray.length > 0 ? specsArray : [{ key: '', value: '' }]);
     setShowModal(true);
   };
 
@@ -110,13 +141,31 @@ const AdminProducts = () => {
       description: '',
       price: '',
       category_id: '',
+      barcode: '',
       stock: '',
       is_featured: false,
       specifications: {}
     });
+    setSpecifications([{ key: '', value: '' }]);
     setEditingProduct(null);
     setImageFile(null);
     setShowModal(false);
+  };
+
+  const addSpecification = () => {
+    setSpecifications([...specifications, { key: '', value: '' }]);
+  };
+
+  const removeSpecification = (index) => {
+    if (specifications.length > 1) {
+      setSpecifications(specifications.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateSpecification = (index, field, value) => {
+    const updated = [...specifications];
+    updated[index][field] = value;
+    setSpecifications(updated);
   };
 
   if (loading) {
@@ -145,6 +194,9 @@ const AdminProducts = () => {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Category
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Barcode
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Price
@@ -180,6 +232,9 @@ const AdminProducts = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {product.category_name || 'No Category'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.barcode || 'No Barcode'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   Rs. {parseFloat(product.price).toLocaleString()}
@@ -223,7 +278,7 @@ const AdminProducts = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
                 {editingProduct ? 'Edit Product' : 'Add Product'}
@@ -280,6 +335,17 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700">Barcode</label>
+                  <input
+                    type="text"
+                    value={formData.barcode}
+                    onChange={(e) => setFormData({...formData, barcode: e.target.value})}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    placeholder="Enter unique product barcode"
+                  />
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-700">Stock</label>
                   <input
                     type="number"
@@ -297,6 +363,52 @@ const AdminProducts = () => {
                     onChange={(e) => setImageFile(e.target.files[0])}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-700">Specifications</label>
+                    <button
+                      type="button"
+                      onClick={addSpecification}
+                      className="text-sm bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {specifications.map((spec, index) => (
+                      <div key={index} className="flex space-x-2">
+                        <input
+                          type="text"
+                          placeholder="Key (e.g., Material)"
+                          value={spec.key}
+                          onChange={(e) => updateSpecification(index, 'key', e.target.value)}
+                          className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Value (e.g., Steel)"
+                          value={spec.value}
+                          onChange={(e) => updateSpecification(index, 'value', e.target.value)}
+                          className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
+                        />
+                        {specifications.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeSpecification(index)}
+                            className="text-red-600 hover:text-red-800 px-2"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Add product specifications as key-value pairs
+                  </p>
                 </div>
 
                 <div className="flex items-center">

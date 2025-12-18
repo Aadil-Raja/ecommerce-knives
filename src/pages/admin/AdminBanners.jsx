@@ -10,7 +10,6 @@ const AdminBanners = () => {
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
-    link_url: '',
     is_active: true,
     display_order: 0
   });
@@ -41,7 +40,7 @@ const AdminBanners = () => {
       
       // Upload image if selected
       if (imageFile) {
-        const uploadResult = await adminAPI.uploadImage(imageFile);
+        const uploadResult = await adminAPI.uploadImage(imageFile, null, null, null, 'banner');
         imageName = uploadResult.filename;
       }
 
@@ -52,8 +51,11 @@ const AdminBanners = () => {
       }
 
       const bannerData = {
-        ...formData,
+        title: formData.title,
+        subtitle: formData.subtitle,
+        link_url: '', // Keep empty - no link functionality
         image_name: imageName,
+        is_active: formData.is_active,
         display_order: parseInt(formData.display_order)
       };
 
@@ -78,7 +80,6 @@ const AdminBanners = () => {
     setFormData({
       title: banner.title,
       subtitle: banner.subtitle || '',
-      link_url: banner.link_url || '',
       is_active: banner.is_active,
       display_order: banner.display_order,
       image_name: banner.image_name
@@ -102,7 +103,6 @@ const AdminBanners = () => {
     setFormData({
       title: '',
       subtitle: '',
-      link_url: '',
       is_active: true,
       display_order: 0
     });
@@ -150,12 +150,6 @@ const AdminBanners = () => {
               
               {banner.subtitle && (
                 <p className="text-sm text-gray-600 mb-2">{banner.subtitle}</p>
-              )}
-              
-              {banner.link_url && (
-                <p className="text-xs text-blue-600 mb-2 truncate">
-                  Link: {banner.link_url}
-                </p>
               )}
               
               <div className="flex justify-between items-center text-xs text-gray-500 mb-3">
@@ -210,17 +204,6 @@ const AdminBanners = () => {
                     value={formData.subtitle}
                     onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Link URL</label>
-                  <input
-                    type="url"
-                    value={formData.link_url}
-                    onChange={(e) => setFormData({...formData, link_url: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="https://example.com"
                   />
                 </div>
 

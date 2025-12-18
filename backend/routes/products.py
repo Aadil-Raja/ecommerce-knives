@@ -18,5 +18,9 @@ def get_products():
 def get_product(product_id):
     product = Product.get_by_id(product_id)
     if product:
+        # Debug logging for specifications
+        print(f"Product {product_id} specifications:")
+        print(f"Type: {type(product.get('specifications'))}")
+        print(f"Value: {product.get('specifications')}")
         return jsonify(product)
     return jsonify({'error': 'Product not found'}), 404

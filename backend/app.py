@@ -8,12 +8,12 @@ from routes.categories import categories_bp
 from routes.orders import orders_bp
 from routes.admin import admin_bp
 from routes.banners import banners_bp
-from database.seeder import seed_database
+from database.seeder import initialize_database
 
 load_dotenv()
 
-# Run seeder on startup
-seed_database()
+# Initialize database on startup
+initialize_database()
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
