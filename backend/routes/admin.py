@@ -222,17 +222,42 @@ def delete_product(product_id):
         conn = get_db_connection()
         cur = conn.cursor()
         
-        # Get product image to delete file
-        cur.execute('SELECT image_name FROM products WHERE id = %s', (product_id,))
+        # Get product details and images before deletion
+        cur.execute('''
+            SELECT p.barcode, c.name as category_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.id = %s
+        ''', (product_id,))
         product = cur.fetchone()
         
-        if product and product['image_name']:
-            delete_image_file(product['image_name'])
+        # Get all product images to delete files
+        cur.execute('SELECT image_name FROM product_images WHERE product_id = %s', (product_id,))
+        images = cur.fetchall()
         
+        # Delete product (CASCADE will delete product_images from DB)
         cur.execute('DELETE FROM products WHERE id = %s', (product_id,))
         conn.commit()
         cur.close()
         conn.close()
+        
+        # Delete image files and folder
+        if product and product['barcode'] and product['category_name']:
+            from pathlib import Path
+            from werkzeug.utils import secure_filename
+            import shutil
+            
+            # Delete individual image files
+            for img in images:
+                delete_image_file(img['image_name'])
+            
+            # Delete the entire product folder
+            static_path = Path(__file__).parent.parent / 'static'
+            product_folder = static_path / 'product_images' / secure_filename(product['category_name']) / secure_filename(product['barcode'])
+            
+            if product_folder.exists() and product_folder.is_dir():
+                shutil.rmtree(product_folder)
+                print(f"Deleted product folder: {product_folder}")
         
         return jsonify({'success': True})
     except Exception as e:
