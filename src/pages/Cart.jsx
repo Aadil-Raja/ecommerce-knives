@@ -51,9 +51,6 @@ function Cart() {
                         src={getImageUrl(item.image)}
                         alt={item.name}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = getImageUrl('knives-bg.jpg');
-                        }}
                       />
                     </div>
 

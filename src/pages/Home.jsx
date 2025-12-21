@@ -69,9 +69,6 @@ function Home() {
                       src={getImageUrl(product.main_image || product.image_name)} 
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        e.target.src = getImageUrl('knives-bg.jpg');
-                      }}
                     />
                   </div>
                   <div className="p-4 sm:p-5 md:p-6 text-center">

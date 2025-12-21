@@ -122,9 +122,6 @@ function ProductDetail() {
                       src={getImageUrl(img)} 
                       alt={`${product.name} view ${index + 1}`}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = getImageUrl('knives-bg.jpg');
-                      }}
                     />
                   </button>
                 ))}
@@ -143,9 +140,6 @@ function ProductDetail() {
                       src={getImageUrl(img)} 
                       alt={`${product.name} angle ${index + 1}`}
                       className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
-                      onError={(e) => {
-                        e.target.src = getImageUrl('knives-bg.jpg');
-                      }}
                     />
                   </div>
                 ))}

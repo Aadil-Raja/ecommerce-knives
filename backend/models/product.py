@@ -30,8 +30,14 @@ class Product:
     
     @staticmethod
     def _add_images_to_products(products):
-        """Add image information to a list of product dicts"""
-        return [Product._add_images_to_product(dict(p)) for p in products]
+        """Add image information to a list of product dicts and filter out products without images"""
+        products_with_images = []
+        for p in products:
+            product = Product._add_images_to_product(dict(p))
+            # Only include products that have at least one valid image
+            if product and product.get('main_image') and product.get('all_images') and len(product.get('all_images', [])) > 0:
+                products_with_images.append(product)
+        return products_with_images
     
     @staticmethod
     def get_all():
