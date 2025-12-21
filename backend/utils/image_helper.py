@@ -25,6 +25,28 @@ def get_product_images(image_folder_path):
             'all_images': []
         }
     
+    # Check if the path is a file (old system) or directory (new system)
+    if static_path.is_file():
+        # Old system: single image file
+        image_extensions = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+        if static_path.suffix.lower() in image_extensions:
+            return {
+                'main_image': image_folder_path,
+                'all_images': [image_folder_path]
+            }
+        else:
+            return {
+                'main_image': None,
+                'all_images': []
+            }
+    
+    # New system: directory with multiple images
+    if not static_path.is_dir():
+        return {
+            'main_image': None,
+            'all_images': []
+        }
+    
     # Get all image files
     image_extensions = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
     all_images = []

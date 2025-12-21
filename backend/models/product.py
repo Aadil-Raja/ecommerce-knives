@@ -1,5 +1,4 @@
 from config.database import get_db_connection
-from utils.image_helper import get_product_images
 from models.product_image import ProductImage
 
 class Product:
@@ -16,12 +15,6 @@ class Product:
                 product['main_image'] = main_image['image_name'] if main_image else None
                 product['all_images'] = [img['image_name'] for img in product_images]
                 product['gallery_images'] = product_images
-            elif product.get('image_name'):
-                # Fallback to old image system
-                images = get_product_images(product['image_name'])
-                product['main_image'] = images['main_image']
-                product['all_images'] = images['all_images']
-                product['gallery_images'] = []
             else:
                 product['main_image'] = None
                 product['all_images'] = []
