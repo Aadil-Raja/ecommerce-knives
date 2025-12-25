@@ -116,59 +116,61 @@ function Category() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <Link 
-                  key={product.id} 
-                  to={`/product/${product.id}`}
-                  className="bg-white border border-gray-200 rounded overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                >
-                  <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={getImageUrl(product.main_image || product.image_name)} 
-                      alt={product.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onLoad={(e) => e.target.style.opacity = '1'}
-                      style={{ opacity: '0', transition: 'opacity 0.3s ease-in-out' }}
-                    />
-                  </div>
-                  <div className="p-4 text-center">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
-                    <div className="flex items-center justify-center">
-                      <span className="text-lg font-bold text-orange-600">{formatPrice(product.price)}</span>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {products.map((product) => (
+                  <Link 
+                    key={product.id} 
+                    to={`/product/${product.id}`}
+                    className="bg-white border border-gray-200 rounded overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                  >
+                    <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+                      <img 
+                        src={getImageUrl(product.main_image || product.image_name)} 
+                        alt={product.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onLoad={(e) => e.target.style.opacity = '1'}
+                        style={{ opacity: '0', transition: 'opacity 0.3s ease-in-out' }}
+                      />
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            
-            {/* Load More Button */}
-            {pagination?.has_more && (
-              <div className="text-center mt-12">
-                <button
-                  onClick={loadMoreProducts}
-                  disabled={loadingMore}
-                  className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-8 py-3 rounded font-semibold transition-colors"
-                >
-                  {loadingMore ? (
-                    <span className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Loading More...
-                    </span>
-                  ) : (
-                    `Load More Products (${pagination.total - products.length} remaining)`
-                  )}
-                </button>
+                    <div className="p-4 text-center">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
+                      <div className="flex items-center justify-center">
+                        <span className="text-lg font-bold text-orange-600">{formatPrice(product.price)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            )}
-            
-            {/* Pagination Info */}
-            {pagination && (
-              <div className="text-center mt-6 text-gray-600 text-sm">
-                Showing {products.length} of {pagination.total} products
-              </div>
-            )}
+              
+              {/* Load More Button */}
+              {pagination?.has_more && (
+                <div className="text-center mt-12">
+                  <button
+                    onClick={loadMoreProducts}
+                    disabled={loadingMore}
+                    className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-8 py-3 rounded font-semibold transition-colors"
+                  >
+                    {loadingMore ? (
+                      <span className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Loading More...
+                      </span>
+                    ) : (
+                      `Load More Products (${pagination.total - products.length} remaining)`
+                    )}
+                  </button>
+                </div>
+              )}
+              
+              {/* Pagination Info */}
+              {pagination && (
+                <div className="text-center mt-6 text-gray-600 text-sm">
+                  Showing {products.length} of {pagination.total} products
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
