@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from models.category import Category
 from models.product import Product
 
@@ -35,8 +35,13 @@ def get_category_products_lightweight(slug):
     if not category:
         return jsonify({'error': 'Category not found'}), 404
     
-    products = Product.get_by_category_lightweight(category['id'])
+    page = int(request.args.get('page', 1))
+    limit = int(request.args.get('limit', 10))
+    
+    result = Product.get_by_category_lightweight(category['id'], page, limit)
+    
     return jsonify({
         'category': category,
-        'products': products
+        'products': result['products'],
+        'pagination': result['pagination']
     })

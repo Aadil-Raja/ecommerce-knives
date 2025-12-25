@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BannerSlider from '../components/BannerSlider';
 import { api } from '../services/api';
-import { getImageUrl, formatPrice } from '../utils/config';
+import { getImageUrl, formatPrice, debugLog } from '../utils/config';
 
 function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -15,17 +15,17 @@ function Home() {
       try {
         const featuredProducts = await api.getFeaturedProducts();
         
-        console.log('🚀 FRONTEND: Received ONLY featured products from backend');
-        console.log('📊 FRONTEND: Number of featured products received:', featuredProducts.length);
-        console.log('📦 FRONTEND: Featured products data:', featuredProducts);
+        debugLog('🚀 FRONTEND: Received ONLY featured products from backend');
+        debugLog('📊 FRONTEND: Number of featured products received:', featuredProducts.length);
+        debugLog('📦 FRONTEND: Featured products data:', featuredProducts);
         
         if (featuredProducts.length > 0) {
-          console.log('🔑 FRONTEND: Fields in each product:', Object.keys(featuredProducts[0]));
-          console.log('📋 FRONTEND: Sample featured product:', featuredProducts[0]);
+          debugLog('🔑 FRONTEND: Fields in each product:', Object.keys(featuredProducts[0]));
+          debugLog('📋 FRONTEND: Sample featured product:', featuredProducts[0]);
         }
         
-        console.log('📏 FRONTEND: Payload size (approx):', JSON.stringify(featuredProducts).length, 'characters');
-        console.log('✅ FRONTEND: No filtering needed - backend sent only featured products!');
+        debugLog('📏 FRONTEND: Payload size (approx):', JSON.stringify(featuredProducts).length, 'characters');
+        debugLog('✅ FRONTEND: No filtering needed - backend sent only featured products!');
         
         setFeaturedProducts(featuredProducts);
         setImagesLoaded(true); // Show content immediately, let images load lazily

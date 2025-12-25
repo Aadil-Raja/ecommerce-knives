@@ -21,6 +21,13 @@ export const getImageUrl = (imagePath) => {
   return `${getBackendBaseUrl()}/${imagePath}`;
 };
 
+// Debug logging utility
+export const debugLog = (...args) => {
+  if (import.meta.env.VITE_DEBUG === 'true') {
+    console.log(...args);
+  }
+};
+
 // Price formatting utility
 export const formatPrice = (price) => {
   if (!price && price !== 0) return 'PKR 0';

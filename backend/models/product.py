@@ -67,35 +67,83 @@ class Product:
         return Product._add_main_image_to_products(products)
 
     @staticmethod
-    def get_all_lightweight():
-        """Get all products with only essential data for listings (id, name, price, main_image)"""
+    def get_all_lightweight(page=1, limit=10):
+        """Get all products with pagination and only essential data for listings"""
+        offset = (page - 1) * limit
+        
         conn = get_db_connection()
         cur = conn.cursor()
+        
+        # Get products with pagination
         cur.execute('''
             SELECT p.id, p.name, p.price, p.is_featured, p.stock
             FROM products p
             ORDER BY p.created_at DESC
-        ''')
+            LIMIT %s OFFSET %s
+        ''', (limit, offset))
         products = cur.fetchall()
+        
+        # Get total count
+        cur.execute('SELECT COUNT(*) as total FROM products')
+        total_count = cur.fetchone()['total']
+        
         cur.close()
         conn.close()
-        return Product._add_main_image_to_products(products)
+        
+        products_with_images = Product._add_main_image_to_products(products)
+        
+        return {
+            'products': products_with_images,
+            'pagination': {
+                'page': page,
+                'limit': limit,
+                'total': total_count,
+                'has_more': (page * limit) < total_count,
+                'total_pages': (total_count + limit - 1) // limit
+            }
+        }
 
     @staticmethod
-    def get_by_category_lightweight(category_id):
-        """Get products by category with only essential data for listings"""
+    def get_by_category_lightweight(category_id, page=1, limit=10):
+        """Get products by category with pagination and lightweight data"""
+        offset = (page - 1) * limit
+        
         conn = get_db_connection()
         cur = conn.cursor()
+        
+        # Get products with pagination
         cur.execute('''
             SELECT p.id, p.name, p.price, p.is_featured, p.stock
             FROM products p
             WHERE p.category_id = %s
             ORDER BY p.created_at DESC
-        ''', (category_id,))
+            LIMIT %s OFFSET %s
+        ''', (category_id, limit, offset))
         products = cur.fetchall()
+        
+        # Get total count for pagination info
+        cur.execute('''
+            SELECT COUNT(*) as total
+            FROM products p
+            WHERE p.category_id = %s
+        ''', (category_id,))
+        total_count = cur.fetchone()['total']
+        
         cur.close()
         conn.close()
-        return Product._add_main_image_to_products(products)
+        
+        products_with_images = Product._add_main_image_to_products(products)
+        
+        return {
+            'products': products_with_images,
+            'pagination': {
+                'page': page,
+                'limit': limit,
+                'total': total_count,
+                'has_more': (page * limit) < total_count,
+                'total_pages': (total_count + limit - 1) // limit
+            }
+        }
 
     @staticmethod
     def get_all():

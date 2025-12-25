@@ -24,13 +24,15 @@ def get_featured_products():
 def get_products_lightweight():
     """Get products with only essential data for listings (faster loading)"""
     category_id = request.args.get('category_id')
+    page = int(request.args.get('page', 1))
+    limit = int(request.args.get('limit', 10))
     
     if category_id:
-        products = Product.get_by_category_lightweight(category_id)
+        result = Product.get_by_category_lightweight(category_id, page, limit)
     else:
-        products = Product.get_all_lightweight()
+        result = Product.get_all_lightweight(page, limit)
     
-    return jsonify(products)
+    return jsonify(result)
 
 @products_bp.route('/<int:product_id>', methods=['GET'])
 def get_product(product_id):

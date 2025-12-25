@@ -8,8 +8,8 @@ export const api = {
     return response.json();
   },
 
-  getCategoryBySlug: async (slug) => {
-    const response = await fetch(`${API_BASE_URL}/categories/${slug}/products/lightweight`);
+  getCategoryBySlug: async (slug, page = 1, limit = 10) => {
+    const response = await fetch(`${API_BASE_URL}/categories/${slug}/products/lightweight?page=${page}&limit=${limit}`);
     return response.json();
   },
 
@@ -29,8 +29,8 @@ export const api = {
     return response.json();
   },
 
-  getProductsByCategory: async (categoryId) => {
-    const response = await fetch(`${API_BASE_URL}/products/lightweight?category_id=${categoryId}`);
+  getProductsByCategory: async (categoryId, page = 1, limit = 10) => {
+    const response = await fetch(`${API_BASE_URL}/products/lightweight?category_id=${categoryId}&page=${page}&limit=${limit}`);
     return response.json();
   },
 
