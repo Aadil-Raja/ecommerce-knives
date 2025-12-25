@@ -76,9 +76,9 @@ class Product:
         
         # Get products that have images with pagination
         cur.execute('''
-            SELECT DISTINCT p.id, p.name, p.price, p.is_featured, p.stock
+            SELECT p.id, p.name, p.price, p.is_featured, p.stock
             FROM products p
-            INNER JOIN product_images pi ON p.id = pi.product_id
+            WHERE EXISTS (SELECT 1 FROM product_images pi WHERE pi.product_id = p.id)
             ORDER BY p.created_at DESC
             LIMIT %s OFFSET %s
         ''', (limit, offset))
@@ -86,9 +86,9 @@ class Product:
         
         # Get total count of products with images
         cur.execute('''
-            SELECT COUNT(DISTINCT p.id) as total
+            SELECT COUNT(p.id) as total
             FROM products p
-            INNER JOIN product_images pi ON p.id = pi.product_id
+            WHERE EXISTS (SELECT 1 FROM product_images pi WHERE pi.product_id = p.id)
         ''')
         total_count = cur.fetchone()['total']
         
@@ -119,10 +119,10 @@ class Product:
         # Get products that have images with pagination
         # Join with product_images to ensure we only get products with images
         cur.execute('''
-            SELECT DISTINCT p.id, p.name, p.price, p.is_featured, p.stock
+            SELECT p.id, p.name, p.price, p.is_featured, p.stock
             FROM products p
-            INNER JOIN product_images pi ON p.id = pi.product_id
-            WHERE p.category_id = %s
+            WHERE p.category_id = %s 
+            AND EXISTS (SELECT 1 FROM product_images pi WHERE pi.product_id = p.id)
             ORDER BY p.created_at DESC
             LIMIT %s OFFSET %s
         ''', (category_id, limit, offset))
@@ -130,10 +130,10 @@ class Product:
         
         # Get total count of products with images
         cur.execute('''
-            SELECT COUNT(DISTINCT p.id) as total
+            SELECT COUNT(p.id) as total
             FROM products p
-            INNER JOIN product_images pi ON p.id = pi.product_id
-            WHERE p.category_id = %s
+            WHERE p.category_id = %s 
+            AND EXISTS (SELECT 1 FROM product_images pi WHERE pi.product_id = p.id)
         ''', (category_id,))
         total_count = cur.fetchone()['total']
         
