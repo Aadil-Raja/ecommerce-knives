@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -7,29 +7,32 @@ import { getImageUrl, formatPrice, debugLog } from '../utils/config';
 
 function Category() {
   const { categoryName } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [category, setCategory] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [pagination, setPagination] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Get current page from URL, default to 1
+  const currentPage = parseInt(searchParams.get('page')) || 1;
 
   useEffect(() => {
-    // Immediately clear old data when category changes
+    // Immediately clear old data when category or page changes
     setCategory(null);
     setProducts([]);
     setLoading(true);
     setImagesLoaded(false);
-    setCurrentPage(1);
     setPagination(null);
     
     const fetchData = async () => {
       try {
-        const data = await api.getCategoryBySlug(categoryName, 1, 10);
+        const data = await api.getCategoryBySlug(categoryName, currentPage, 10);
         
         debugLog('🚀 FRONTEND: Received paginated category products');
         debugLog('📂 FRONTEND: Category:', data.category);
+        debugLog('📄 FRONTEND: Current page:', currentPage);
         debugLog('📊 FRONTEND: Number of products received:', data.products.length);
         debugLog('📄 FRONTEND: Pagination info:', data.pagination);
         debugLog('📦 FRONTEND: Full category response:', data);
@@ -55,27 +58,82 @@ function Category() {
     };
 
     fetchData();
-  }, [categoryName]);
+  }, [categoryName, currentPage]);
 
-  const loadMoreProducts = async () => {
-    if (!pagination?.has_more || loadingMore) return;
-    
-    setLoadingMore(true);
-    try {
-      const nextPage = currentPage + 1;
-      const data = await api.getCategoryBySlug(categoryName, nextPage, 10);
-      
-      debugLog('🔄 FRONTEND: Loading more products - Page', nextPage);
-      debugLog('📊 FRONTEND: Additional products received:', data.products.length);
-      
-      setProducts(prevProducts => [...prevProducts, ...data.products]);
-      setPagination(data.pagination);
-      setCurrentPage(nextPage);
-    } catch (error) {
-      console.error('Error loading more products:', error);
-    } finally {
-      setLoadingMore(false);
+  const goToPage = (page) => {
+    if (page === 1) {
+      // Remove page parameter for page 1 (cleaner URLs)
+      navigate(`/category/${categoryName}`);
+    } else {
+      navigate(`/category/${categoryName}?page=${page}`);
     }
+  };
+
+  const renderPagination = () => {
+    if (!pagination || pagination.total_pages <= 1) return null;
+
+    const pages = [];
+    const totalPages = pagination.total_pages;
+    const current = pagination.page;
+
+    // Always show first page
+    if (current > 3) {
+      pages.push(1);
+      if (current > 4) pages.push('...');
+    }
+
+    // Show pages around current page
+    for (let i = Math.max(1, current - 2); i <= Math.min(totalPages, current + 2); i++) {
+      pages.push(i);
+    }
+
+    // Always show last page
+    if (current < totalPages - 2) {
+      if (current < totalPages - 3) pages.push('...');
+      pages.push(totalPages);
+    }
+
+    return (
+      <div className="flex justify-center items-center space-x-2 mt-12">
+        {/* Previous Button */}
+        <button
+          onClick={() => goToPage(current - 1)}
+          disabled={current === 1}
+          className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        {/* Page Numbers */}
+        {pages.map((page, index) => (
+          <span key={index}>
+            {page === '...' ? (
+              <span className="px-3 py-2 text-sm font-medium text-gray-700">...</span>
+            ) : (
+              <button
+                onClick={() => goToPage(page)}
+                className={`px-3 py-2 text-sm font-medium rounded-md ${
+                  page === current
+                    ? 'bg-orange-600 text-white'
+                    : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {page}
+              </button>
+            )}
+          </span>
+        ))}
+
+        {/* Next Button */}
+        <button
+          onClick={() => goToPage(current + 1)}
+          disabled={current === totalPages}
+          className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   if (loading || !imagesLoaded) {
@@ -144,32 +202,8 @@ function Category() {
                 ))}
               </div>
               
-              {/* Load More Button */}
-              {pagination?.has_more && (
-                <div className="text-center mt-12">
-                  <button
-                    onClick={loadMoreProducts}
-                    disabled={loadingMore}
-                    className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-8 py-3 rounded font-semibold transition-colors"
-                  >
-                    {loadingMore ? (
-                      <span className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Loading More...
-                      </span>
-                    ) : (
-                      `Load More Products (${pagination.total - products.length} remaining)`
-                    )}
-                  </button>
-                </div>
-              )}
-              
-              {/* Pagination Info */}
-              {pagination && (
-                <div className="text-center mt-6 text-gray-600 text-sm">
-                  Showing {products.length} of {pagination.total} products
-                </div>
-              )}
+              {/* Pagination */}
+              {renderPagination()}
             </>
           )}
         </div>
