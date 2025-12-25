@@ -14,6 +14,12 @@ def get_products():
     
     return jsonify(products)
 
+@products_bp.route('/featured', methods=['GET'])
+def get_featured_products():
+    """Get only featured products with lightweight data"""
+    products = Product.get_featured_lightweight()
+    return jsonify(products)
+
 @products_bp.route('/lightweight', methods=['GET'])
 def get_products_lightweight():
     """Get products with only essential data for listings (faster loading)"""

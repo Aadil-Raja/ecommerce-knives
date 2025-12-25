@@ -13,26 +13,32 @@ function Category() {
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
   useEffect(() => {
+    // Immediately clear old data when category changes
+    setCategory(null);
+    setProducts([]);
+    setLoading(true);
+    setImagesLoaded(false);
+    
     const fetchData = async () => {
       try {
         const data = await api.getCategoryBySlug(categoryName);
+        
+        console.log('🚀 FRONTEND: Received lightweight category products');
+        console.log('📂 FRONTEND: Category:', data.category);
+        console.log('📊 FRONTEND: Number of products received:', data.products.length);
+        console.log('📦 FRONTEND: Full category response:', data);
+        
+        if (data.products.length > 0) {
+          console.log('🔑 FRONTEND: Fields in each product:', Object.keys(data.products[0]));
+          console.log('📋 FRONTEND: Sample product:', data.products[0]);
+        }
+        
+        console.log('📏 FRONTEND: Products payload size (approx):', JSON.stringify(data.products).length, 'characters');
+        console.log('📏 FRONTEND: Total payload size (approx):', JSON.stringify(data).length, 'characters');
+        
         setCategory(data.category);
         setProducts(data.products);
-        
-        // Preload all product images
-        if (data.products && data.products.length > 0) {
-          const imagePromises = data.products.map(product => {
-            return new Promise((resolve) => {
-              const img = new Image();
-              img.onload = () => resolve();
-              img.onerror = () => resolve();
-              img.src = `/${product.main_image || product.image_name}`;
-            });
-          });
-          
-          await Promise.all(imagePromises);
-        }
-        setImagesLoaded(true);
+        setImagesLoaded(true); // Show content immediately, let images load lazily
       } catch (error) {
         console.error('Error fetching products:', error);
         setImagesLoaded(true);
@@ -48,10 +54,17 @@ function Category() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
-            <p className="text-gray-600 text-xl">Loading products...</p>
+        <main className="flex-1 py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-5xl font-bold text-gray-900 mb-4 text-center uppercase tracking-wide">
+              {categoryName ? categoryName.replace(/-/g, ' ') : 'Category'}
+            </h1>
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
+                <p className="text-gray-600 text-xl">Loading products...</p>
+              </div>
+            </div>
           </div>
         </main>
         <Footer />
@@ -86,7 +99,10 @@ function Category() {
                     <img 
                       src={getImageUrl(product.main_image || product.image_name)} 
                       alt={product.name}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onLoad={(e) => e.target.style.opacity = '1'}
+                      style={{ opacity: '0', transition: 'opacity 0.3s ease-in-out' }}
                     />
                   </div>
                   <div className="p-4 text-center">

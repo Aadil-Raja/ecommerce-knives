@@ -50,6 +50,23 @@ class Product:
         return products_with_images
     
     @staticmethod
+    def get_featured_lightweight():
+        """Get only featured products with lightweight data"""
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT p.id, p.name, p.price, p.is_featured, p.stock
+            FROM products p
+            WHERE p.is_featured = TRUE
+            ORDER BY p.created_at DESC
+            LIMIT 3
+        ''')
+        products = cur.fetchall()
+        cur.close()
+        conn.close()
+        return Product._add_main_image_to_products(products)
+
+    @staticmethod
     def get_all_lightweight():
         """Get all products with only essential data for listings (id, name, price, main_image)"""
         conn = get_db_connection()

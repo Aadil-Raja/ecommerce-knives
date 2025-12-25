@@ -13,24 +13,22 @@ function Home() {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        const products = await api.getProducts();
-        const featured = products.filter(p => p.is_featured).slice(0, 3);
-        setFeaturedProducts(featured);
+        const featuredProducts = await api.getFeaturedProducts();
         
-        // Preload featured product images
-        if (featured.length > 0) {
-          const imagePromises = featured.map(product => {
-            return new Promise((resolve) => {
-              const img = new Image();
-              img.onload = () => resolve();
-              img.onerror = () => resolve();
-              img.src = getImageUrl(product.main_image || product.image_name);
-            });
-          });
-          
-          await Promise.all(imagePromises);
+        console.log('🚀 FRONTEND: Received ONLY featured products from backend');
+        console.log('📊 FRONTEND: Number of featured products received:', featuredProducts.length);
+        console.log('📦 FRONTEND: Featured products data:', featuredProducts);
+        
+        if (featuredProducts.length > 0) {
+          console.log('🔑 FRONTEND: Fields in each product:', Object.keys(featuredProducts[0]));
+          console.log('📋 FRONTEND: Sample featured product:', featuredProducts[0]);
         }
-        setImagesLoaded(true);
+        
+        console.log('📏 FRONTEND: Payload size (approx):', JSON.stringify(featuredProducts).length, 'characters');
+        console.log('✅ FRONTEND: No filtering needed - backend sent only featured products!');
+        
+        setFeaturedProducts(featuredProducts);
+        setImagesLoaded(true); // Show content immediately, let images load lazily
       } catch (error) {
         console.error('Error fetching featured products:', error);
         setImagesLoaded(true);
@@ -68,7 +66,10 @@ function Home() {
                     <img 
                       src={getImageUrl(product.main_image || product.image_name)} 
                       alt={product.name}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onLoad={(e) => e.target.style.opacity = '1'}
+                      style={{ opacity: '0', transition: 'opacity 0.3s ease-in-out' }}
                     />
                   </div>
                   <div className="p-4 sm:p-5 md:p-6 text-center">

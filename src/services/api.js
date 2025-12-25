@@ -19,6 +19,11 @@ export const api = {
     return response.json();
   },
 
+  getFeaturedProducts: async () => {
+    const response = await fetch(`${API_BASE_URL}/products/featured`);
+    return response.json();
+  },
+
   getProductById: async (id) => {
     const response = await fetch(`${API_BASE_URL}/products/${id}`);
     return response.json();
