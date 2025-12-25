@@ -44,6 +44,29 @@ const AdminProducts = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate required fields for image path generation
+    if (!formData.name.trim()) {
+      alert('Product name is required for image path generation');
+      return;
+    }
+    
+    if (!formData.category_id) {
+      alert('Category is required for image path generation');
+      return;
+    }
+    
+    if (!formData.barcode.trim()) {
+      alert('Barcode is required for image path generation');
+      return;
+    }
+    
+    // For new products, image is required
+    if (!editingProduct && !imageFile) {
+      alert('Image is required for new products');
+      return;
+    }
+    
     setUploading(true);
 
     try {
@@ -286,7 +309,7 @@ const AdminProducts = () => {
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <label className="block text-sm font-medium text-gray-700">Name * (Required for image path)</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -303,6 +326,7 @@ const AdminProducts = () => {
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
                     rows="3"
+                    required
                   />
                 </div>
 
@@ -319,11 +343,12 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Category</label>
+                  <label className="block text-sm font-medium text-gray-700">Category * (Required for image path)</label>
                   <select
                     value={formData.category_id}
                     onChange={(e) => setFormData({...formData, category_id: e.target.value})}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
                   >
                     <option value="">Select Category</option>
                     {categories.map((category) => (
@@ -335,34 +360,46 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Barcode</label>
+                  <label className="block text-sm font-medium text-gray-700">Barcode * (Required for image path)</label>
                   <input
                     type="text"
                     value={formData.barcode}
                     onChange={(e) => setFormData({...formData, barcode: e.target.value})}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="Enter unique product barcode"
+                    placeholder="Enter unique product barcode (e.g., BU-001)"
+                    required
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Used for organizing images: product_images/Category/Barcode/
+                  </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Stock</label>
                   <input
                     type="number"
+                    min="0"
                     value={formData.stock}
                     onChange={(e) => setFormData({...formData, stock: e.target.value})}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Image</label>
+                  <label className="block text-sm font-medium text-gray-700">Image *</label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setImageFile(e.target.files[0])}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required={!editingProduct}
                   />
+                  {editingProduct && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Leave empty to keep current image
+                    </p>
+                  )}
                 </div>
 
                 <div>
