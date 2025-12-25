@@ -9,13 +9,13 @@ export const api = {
   },
 
   getCategoryBySlug: async (slug) => {
-    const response = await fetch(`${API_BASE_URL}/categories/${slug}/products`);
+    const response = await fetch(`${API_BASE_URL}/categories/${slug}/products/lightweight`);
     return response.json();
   },
 
   // Products
   getProducts: async () => {
-    const response = await fetch(`${API_BASE_URL}/products`);
+    const response = await fetch(`${API_BASE_URL}/products/lightweight`);
     return response.json();
   },
 
@@ -25,7 +25,7 @@ export const api = {
   },
 
   getProductsByCategory: async (categoryId) => {
-    const response = await fetch(`${API_BASE_URL}/products?category_id=${categoryId}`);
+    const response = await fetch(`${API_BASE_URL}/products/lightweight?category_id=${categoryId}`);
     return response.json();
   },
 

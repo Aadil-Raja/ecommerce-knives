@@ -20,3 +20,16 @@ export const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   return `${getBackendBaseUrl()}/${imagePath}`;
 };
+
+// Price formatting utility
+export const formatPrice = (price) => {
+  if (!price && price !== 0) return 'PKR 0';
+  
+  // Convert to number and remove decimals if they are .00
+  const numPrice = parseFloat(price);
+  const formattedNumber = numPrice % 1 === 0 ? 
+    numPrice.toLocaleString('en-US') : 
+    numPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  
+  return `PKR ${formattedNumber}`;
+};

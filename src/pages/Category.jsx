@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../services/api';
-import { getImageUrl } from '../utils/config';
+import { getImageUrl, formatPrice } from '../utils/config';
 
 function Category() {
   const { categoryName } = useParams();
@@ -92,7 +92,7 @@ function Category() {
                   <div className="p-4 text-center">
                     <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
                     <div className="flex items-center justify-center">
-                      <span className="text-lg font-bold text-orange-600">RS {product.price} PKR</span>
+                      <span className="text-lg font-bold text-orange-600">{formatPrice(product.price)}</span>
                     </div>
                   </div>
                 </Link>

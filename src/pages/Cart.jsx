@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
-import { getImageUrl } from '../utils/config';
+import { getImageUrl, formatPrice } from '../utils/config';
 
 function Cart() {
   const { cart, removeFromCart, updateQuantity } = useCart();
@@ -57,7 +57,7 @@ function Cart() {
                     {/* Product Details */}
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.name}</h3>
-                      <p className="text-xl font-bold text-orange-600 mb-4">RS {item.price} PKR</p>
+                      <p className="text-xl font-bold text-orange-600 mb-4">{formatPrice(item.price)}</p>
 
                       <div className="flex items-center gap-4">
                         {/* Quantity Controls */}
@@ -90,7 +90,7 @@ function Cart() {
                     {/* Item Total */}
                     <div className="text-right">
                       <p className="text-lg font-bold text-gray-900">
-                        RS {(item.price * item.quantity).toFixed(2)} PKR
+                        {formatPrice(item.price * item.quantity)}
                       </p>
                     </div>
                   </div>
@@ -106,7 +106,7 @@ function Cart() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-700">
                     <span>Subtotal ({cart.totalItems} items)</span>
-                    <span>RS {cart.totalPrice.toFixed(2)} PKR</span>
+                    <span>{formatPrice(cart.totalPrice)}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Shipping</span>
@@ -114,7 +114,7 @@ function Cart() {
                   </div>
                   <div className="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold text-gray-900">
                     <span>Total</span>
-                    <span className="text-orange-600">RS {cart.totalPrice.toFixed(2)} PKR</span>
+                    <span className="text-orange-600">{formatPrice(cart.totalPrice)}</span>
                   </div>
                 </div>
 

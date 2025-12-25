@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
-import { getImageUrl } from '../utils/config';
+import { getImageUrl, formatPrice } from '../utils/config';
 
 function ProductDetail() {
   const { productId } = useParams();
@@ -156,18 +156,18 @@ function ProductDetail() {
                   {product.name}
                 </h1>
                 <p className="text-3xl font-bold text-orange-600">
-                  RS {product.price} PKR
+                  {formatPrice(product.price)}
                 </p>
               </div>
 
-              <div className="border-t border-gray-200 pt-6 mb-6">
-                <p className="text-gray-700 leading-relaxed mb-6">
+              <div className="border-t border-gray-200 pt-6">
+                <p className="text-gray-700 leading-relaxed">
                   {product.description}
                 </p>
 
                 {/* Product specifications */}
                 {product.specifications && Object.keys(product.specifications).length > 0 && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 mt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Product Specifications</h3>
                     
                     {Object.entries(product.specifications).map(([key, value]) => (
@@ -184,7 +184,7 @@ function ProductDetail() {
                 )}
               </div>
 
-              <div className="mt-auto">
+              <div className="pt-6">
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-gray-600">Stock:</span>
                   <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>

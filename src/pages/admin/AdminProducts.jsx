@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI } from '../../services/adminAPI';
-import { getImageUrl } from '../../utils/config';
+import { getImageUrl, formatPrice } from '../../utils/config';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -237,7 +237,7 @@ const AdminProducts = () => {
                   {product.barcode || 'No Barcode'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Rs. {parseFloat(product.price).toLocaleString()}
+                  {formatPrice(product.price)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {product.stock}

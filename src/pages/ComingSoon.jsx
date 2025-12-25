@@ -7,7 +7,7 @@ function ComingSoon() {
       {/* Logo at Top Center */}
       <div className="w-full flex justify-center pt-8 md:pt-12 mb-auto">
         <img 
-          src={getImageUrl('logo.png')} 
+          src="/logo.png" 
           alt="Sharp Lab by Owais" 
           className="h-20 md:h-28 w-auto"
         />

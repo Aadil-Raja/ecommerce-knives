@@ -14,6 +14,18 @@ def get_products():
     
     return jsonify(products)
 
+@products_bp.route('/lightweight', methods=['GET'])
+def get_products_lightweight():
+    """Get products with only essential data for listings (faster loading)"""
+    category_id = request.args.get('category_id')
+    
+    if category_id:
+        products = Product.get_by_category_lightweight(category_id)
+    else:
+        products = Product.get_all_lightweight()
+    
+    return jsonify(products)
+
 @products_bp.route('/<int:product_id>', methods=['GET'])
 def get_product(product_id):
     product = Product.get_by_id(product_id)

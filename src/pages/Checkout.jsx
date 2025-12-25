@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
+import { formatPrice } from '../utils/config';
 
 function Checkout() {
   const navigate = useNavigate();
@@ -223,7 +224,7 @@ function Checkout() {
                         {item.name} x {item.quantity}
                       </span>
                       <span className="text-gray-900 font-semibold">
-                        RS {(item.price * item.quantity).toFixed(2)}
+                        {formatPrice(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -232,7 +233,7 @@ function Checkout() {
                 <div className="border-t border-gray-200 pt-4 space-y-3 mb-6">
                   <div className="flex justify-between text-gray-700">
                     <span>Subtotal</span>
-                    <span>RS {cart.totalPrice.toFixed(2)} PKR</span>
+                    <span>{formatPrice(cart.totalPrice)}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Shipping</span>
@@ -240,7 +241,7 @@ function Checkout() {
                   </div>
                   <div className="flex justify-between text-xl font-bold text-gray-900">
                     <span>Total</span>
-                    <span className="text-orange-600">RS {cart.totalPrice.toFixed(2)} PKR</span>
+                    <span className="text-orange-600">{formatPrice(cart.totalPrice)}</span>
                   </div>
                 </div>
 

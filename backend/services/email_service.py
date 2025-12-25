@@ -3,6 +3,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 
+def format_price(price):
+    """Format price to PKR with comma separation and no unnecessary decimals"""
+    if price % 1 == 0:
+        return f"PKR {int(price):,}"
+    else:
+        return f"PKR {price:,.2f}"
+
 class EmailService:
     @staticmethod
     def send_order_confirmation(customer_email, customer_name, order_number, items, total_amount):
@@ -70,13 +77,13 @@ class EmailService:
                 html_body += f"""
                             <div class="item">
                                 <strong>{item['name']}</strong><br>
-                                Quantity: {quantity} × RS {price:.2f} = RS {subtotal:.2f} PKR
+                                Quantity: {quantity} × {format_price(price)} = {format_price(subtotal)}
                             </div>
                 """
             
             html_body += f"""
                             <div class="total">
-                                Total Amount: RS {total_amount:.2f} PKR
+                                Total Amount: {format_price(total_amount)}
                             </div>
                         </div>
                         
@@ -183,13 +190,13 @@ class EmailService:
                 html_body += f"""
                             <div class="item">
                                 <strong>{item['name']}</strong><br>
-                                Quantity: {quantity} × RS {price:.2f} = RS {subtotal:.2f} PKR
+                                Quantity: {quantity} × {format_price(price)} = {format_price(subtotal)}
                             </div>
                 """
             
             html_body += f"""
                             <div class="total">
-                                Total Amount: RS {total_amount:.2f} PKR
+                                Total Amount: {format_price(total_amount)}
                             </div>
                         </div>
                         

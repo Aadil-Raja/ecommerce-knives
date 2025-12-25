@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BannerSlider from '../components/BannerSlider';
 import { api } from '../services/api';
-import { getImageUrl } from '../utils/config';
+import { getImageUrl, formatPrice } from '../utils/config';
 
 function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -74,7 +74,7 @@ function Home() {
                   <div className="p-4 sm:p-5 md:p-6 text-center">
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
                     <div className="flex items-center justify-center">
-                      <span className="text-xl sm:text-2xl font-bold text-orange-600">RS {product.price} PKR</span>
+                      <span className="text-xl sm:text-2xl font-bold text-orange-600">{formatPrice(product.price)}</span>
                     </div>
                   </div>
                 </Link>

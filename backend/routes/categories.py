@@ -27,3 +27,16 @@ def get_category_products(slug):
         'category': category,
         'products': products
     })
+
+@categories_bp.route('/<slug>/products/lightweight', methods=['GET'])
+def get_category_products_lightweight(slug):
+    """Get category products with only essential data for faster loading"""
+    category = Category.get_by_slug(slug)
+    if not category:
+        return jsonify({'error': 'Category not found'}), 404
+    
+    products = Product.get_by_category_lightweight(category['id'])
+    return jsonify({
+        'category': category,
+        'products': products
+    })
