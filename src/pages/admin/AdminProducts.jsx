@@ -309,7 +309,7 @@ const AdminProducts = () => {
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Name * (Required for image path)</label>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -343,7 +343,7 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Category * (Required for image path)</label>
+                  <label className="block text-sm font-medium text-gray-700">Category</label>
                   <select
                     value={formData.category_id}
                     onChange={(e) => setFormData({...formData, category_id: e.target.value})}
@@ -360,7 +360,7 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Barcode * (Required for image path)</label>
+                  <label className="block text-sm font-medium text-gray-700">Barcode</label>
                   <input
                     type="text"
                     value={formData.barcode}
@@ -387,7 +387,7 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Image *</label>
+                  <label className="block text-sm font-medium text-gray-700">Image</label>
                   <input
                     type="file"
                     accept="image/*"

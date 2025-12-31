@@ -1,6 +1,9 @@
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:5000/api';
 const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://127.0.0.1:5000';
 
+// Import pagination config
+import { PRODUCTS_PER_PAGE } from '../utils/config';
+
 export const api = {
   // Categories
   getCategories: async () => {
@@ -8,14 +11,14 @@ export const api = {
     return response.json();
   },
 
-  getCategoryBySlug: async (slug, page = 1, limit = 10) => {
+  getCategoryBySlug: async (slug, page = 1, limit = PRODUCTS_PER_PAGE) => {
     const response = await fetch(`${API_BASE_URL}/categories/${slug}/products/lightweight?page=${page}&limit=${limit}`);
     return response.json();
   },
 
   // Products
-  getProducts: async () => {
-    const response = await fetch(`${API_BASE_URL}/products/lightweight`);
+  getProducts: async (page = 1, limit = PRODUCTS_PER_PAGE) => {
+    const response = await fetch(`${API_BASE_URL}/products/lightweight?page=${page}&limit=${limit}`);
     return response.json();
   },
 
@@ -29,7 +32,7 @@ export const api = {
     return response.json();
   },
 
-  getProductsByCategory: async (categoryId, page = 1, limit = 10) => {
+  getProductsByCategory: async (categoryId, page = 1, limit = PRODUCTS_PER_PAGE) => {
     const response = await fetch(`${API_BASE_URL}/products/lightweight?category_id=${categoryId}&page=${page}&limit=${limit}`);
     return response.json();
   },

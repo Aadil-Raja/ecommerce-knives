@@ -59,7 +59,6 @@ class Product:
             FROM products p
             WHERE p.is_featured = TRUE
             ORDER BY p.created_at DESC
-            LIMIT 3
         ''')
         products = cur.fetchall()
         cur.close()

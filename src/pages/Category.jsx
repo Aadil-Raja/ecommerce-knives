@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../services/api';
-import { getImageUrl, formatPrice, debugLog } from '../utils/config';
+import { getImageUrl, formatPrice, debugLog, PRODUCTS_PER_PAGE } from '../utils/config';
 
 function Category() {
   const { categoryName } = useParams();
@@ -28,7 +28,7 @@ function Category() {
     
     const fetchData = async () => {
       try {
-        const data = await api.getCategoryBySlug(categoryName, currentPage, 10);
+        const data = await api.getCategoryBySlug(categoryName, currentPage, PRODUCTS_PER_PAGE);
         
         debugLog('🚀 FRONTEND: Received paginated category products');
         debugLog('📂 FRONTEND: Category:', data.category);

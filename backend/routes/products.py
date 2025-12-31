@@ -25,7 +25,7 @@ def get_products_lightweight():
     """Get products with only essential data for listings (faster loading)"""
     category_id = request.args.get('category_id')
     page = int(request.args.get('page', 1))
-    limit = int(request.args.get('limit', 10))
+    limit = int(request.args.get('limit', 10))  # Default fallback, but frontend controls this
     
     if category_id:
         result = Product.get_by_category_lightweight(category_id, page, limit)

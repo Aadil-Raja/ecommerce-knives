@@ -28,6 +28,9 @@ export const debugLog = (...args) => {
   }
 };
 
+// Pagination configuration
+export const PRODUCTS_PER_PAGE = parseInt(import.meta.env.VITE_PRODUCTS_PER_PAGE) || 10;
+
 // Price formatting utility
 export const formatPrice = (price) => {
   if (!price && price !== 0) return 'PKR 0';
