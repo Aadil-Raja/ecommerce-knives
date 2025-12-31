@@ -170,16 +170,29 @@ function ProductDetail() {
                   <div className="space-y-3 mt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Product Specifications</h3>
                     
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="flex items-start">
-                        <span className="text-gray-500 mr-2">•</span>
-                        <span className="text-gray-700">
-                          <span className="font-medium">{key}:</span> {
-                            Array.isArray(value) ? value.join(', ') : value
-                          }
-                        </span>
-                      </div>
-                    ))}
+                    {Object.entries(product.specifications)
+                      .map(([key, value]) => {
+                        // Handle both old format (string) and new format (object with order)
+                        if (typeof value === 'string') {
+                          return { key, value, order: 999 }; // Legacy format
+                        }
+                        return {
+                          key,
+                          value: value.value || value,
+                          order: value.order || 999
+                        };
+                      })
+                      .sort((a, b) => a.order - b.order) // Sort by order
+                      .map(({ key, value }) => (
+                        <div key={key} className="flex items-start">
+                          <span className="text-gray-500 mr-2">•</span>
+                          <span className="text-gray-700">
+                            <span className="font-medium">{key}:</span> {
+                              Array.isArray(value) ? value.join(', ') : value
+                            }
+                          </span>
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>

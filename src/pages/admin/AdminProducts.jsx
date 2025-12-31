@@ -19,7 +19,7 @@ const AdminProducts = () => {
     is_featured: false,
     specifications: {}
   });
-  const [specifications, setSpecifications] = useState([{ key: '', value: '' }]);
+  const [specifications, setSpecifications] = useState([{ key: '', value: '', order: 1 }]);
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -85,12 +85,23 @@ const AdminProducts = () => {
         imageName = uploadResult.filename;
       }
 
-      // Convert specifications array to object
+      // Convert specifications array to object with order
       const specificationsObj = {};
-      specifications.forEach(spec => {
-        if (spec.key.trim() && spec.value.trim()) {
-          specificationsObj[spec.key.trim()] = spec.value.trim();
-        }
+      
+      // Sort by order and normalize to sequential
+      const sortedSpecs = specifications
+        .filter(spec => spec.key.trim() && spec.value.trim())
+        .sort((a, b) => (a.order || 999) - (b.order || 999))
+        .map((spec, index) => ({
+          ...spec,
+          order: index + 1 // Normalize to sequential order
+        }));
+      
+      sortedSpecs.forEach(spec => {
+        specificationsObj[spec.key.trim()] = {
+          value: spec.value.trim(),
+          order: spec.order
+        };
       });
 
       const productData = {
@@ -138,11 +149,19 @@ const AdminProducts = () => {
     });
     
     // Convert specifications object to array for editing
-    const specsArray = Object.entries(product.specifications || {}).map(([key, value]) => ({
-      key,
-      value: value.toString()
-    }));
-    setSpecifications(specsArray.length > 0 ? specsArray : [{ key: '', value: '' }]);
+    const specsArray = Object.entries(product.specifications || {}).map(([key, value]) => {
+      // Handle both old format (string) and new format (object with order)
+      if (typeof value === 'string') {
+        return { key, value, order: 999 }; // Legacy format - assign high order
+      }
+      return {
+        key,
+        value: value.value || value,
+        order: value.order || 999
+      };
+    }).sort((a, b) => a.order - b.order); // Sort by order for editing
+    
+    setSpecifications(specsArray.length > 0 ? specsArray : [{ key: '', value: '', order: 1 }]);
     setShowModal(true);
   };
 
@@ -169,14 +188,15 @@ const AdminProducts = () => {
       is_featured: false,
       specifications: {}
     });
-    setSpecifications([{ key: '', value: '' }]);
+    setSpecifications([{ key: '', value: '', order: 1 }]);
     setEditingProduct(null);
     setImageFile(null);
     setShowModal(false);
   };
 
   const addSpecification = () => {
-    setSpecifications([...specifications, { key: '', value: '' }]);
+    const nextOrder = Math.max(...specifications.map(s => s.order || 0)) + 1;
+    setSpecifications([...specifications, { key: '', value: '', order: nextOrder }]);
   };
 
   const removeSpecification = (index) => {
@@ -187,7 +207,31 @@ const AdminProducts = () => {
 
   const updateSpecification = (index, field, value) => {
     const updated = [...specifications];
-    updated[index][field] = value;
+    
+    if (field === 'order') {
+      // Validate order input
+      const orderValue = parseInt(value);
+      
+      // Reject invalid inputs
+      if (isNaN(orderValue) || orderValue <= 0 || orderValue > 100) {
+        return; // Don't update if invalid
+      }
+      
+      // Check for duplicates and auto-resolve
+      const existingOrders = updated
+        .filter((_, i) => i !== index)
+        .map(spec => spec.order);
+      
+      let finalOrder = orderValue;
+      while (existingOrders.includes(finalOrder)) {
+        finalOrder++;
+      }
+      
+      updated[index][field] = finalOrder;
+    } else {
+      updated[index][field] = value;
+    }
+    
     setSpecifications(updated);
   };
 
@@ -431,6 +475,16 @@ const AdminProducts = () => {
                           onChange={(e) => updateSpecification(index, 'value', e.target.value)}
                           className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
                         />
+                        <input
+                          type="number"
+                          placeholder="Order"
+                          value={spec.order || ''}
+                          onChange={(e) => updateSpecification(index, 'order', e.target.value)}
+                          className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
+                          min="1"
+                          max="100"
+                          title="Order (1-100)"
+                        />
                         {specifications.length > 1 && (
                           <button
                             type="button"
@@ -444,7 +498,7 @@ const AdminProducts = () => {
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-gray-500">
-                    Add product specifications as key-value pairs
+                    Add product specifications as key-value pairs with display order (1-100)
                   </p>
                 </div>
 
