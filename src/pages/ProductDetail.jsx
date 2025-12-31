@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
-import { getImageUrl, formatPrice } from '../utils/config';
+import { getImageUrl, formatPrice, debugLog } from '../utils/config';
 
 function ProductDetail() {
   const { productId } = useParams();
@@ -22,9 +22,9 @@ function ProductDetail() {
     const fetchProduct = async () => {
       try {
         const data = await api.getProductById(productId);
-        console.log('Product data received:', data);
-        console.log('Specifications:', data.specifications);
-        console.log('Specifications type:', typeof data.specifications);
+        debugLog('Product data received:', data);
+        debugLog('Specifications:', data.specifications);
+        debugLog('Specifications type:', typeof data.specifications);
         setProduct(data);
         
         // Preload all images

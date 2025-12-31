@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI } from '../../services/adminAPI';
-import { getImageUrl, formatPrice } from '../../utils/config';
+import { getImageUrl, formatPrice, debugLog } from '../../utils/config';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -128,9 +128,9 @@ const AdminProducts = () => {
       };
 
       // Debug logging
-      console.log('Product data being sent:', productData);
-      console.log('Specifications object:', specificationsObj);
-      console.log('Specifications type:', typeof specificationsObj);
+      debugLog('Product data being sent:', productData);
+      debugLog('Specifications object:', specificationsObj);
+      debugLog('Specifications type:', typeof specificationsObj);
 
       if (editingProduct) {
         await adminAPI.updateProduct(editingProduct.id, productData);
