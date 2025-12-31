@@ -67,6 +67,16 @@ const AdminProducts = () => {
       return;
     }
     
+    // Validate specifications have order values
+    const hasEmptyOrders = specifications.some(spec => 
+      spec.key.trim() && spec.value.trim() && (spec.order === '' || spec.order === null || spec.order === undefined)
+    );
+    
+    if (hasEmptyOrders) {
+      alert('All specifications must have an order number (1-100)');
+      return;
+    }
+    
     setUploading(true);
 
     try {
@@ -91,6 +101,10 @@ const AdminProducts = () => {
       // Sort by order and normalize to sequential
       const sortedSpecs = specifications
         .filter(spec => spec.key.trim() && spec.value.trim())
+        .map(spec => ({
+          ...spec,
+          order: spec.order === '' || spec.order === null || spec.order === undefined ? 999 : spec.order
+        }))
         .sort((a, b) => (a.order || 999) - (b.order || 999))
         .map((spec, index) => ({
           ...spec,
@@ -209,10 +223,17 @@ const AdminProducts = () => {
     const updated = [...specifications];
     
     if (field === 'order') {
+      // Allow empty value during editing
+      if (value === '' || value === null || value === undefined) {
+        updated[index][field] = '';
+        setSpecifications(updated);
+        return;
+      }
+      
       // Validate order input
       const orderValue = parseInt(value);
       
-      // Reject invalid inputs
+      // Reject invalid inputs (but allow empty)
       if (isNaN(orderValue) || orderValue <= 0 || orderValue > 100) {
         return; // Don't update if invalid
       }
@@ -220,7 +241,8 @@ const AdminProducts = () => {
       // Check for duplicates and auto-resolve
       const existingOrders = updated
         .filter((_, i) => i !== index)
-        .map(spec => spec.order);
+        .map(spec => spec.order)
+        .filter(order => order !== '' && !isNaN(order)); // Ignore empty orders
       
       let finalOrder = orderValue;
       while (existingOrders.includes(finalOrder)) {
