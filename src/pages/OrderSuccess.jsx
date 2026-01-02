@@ -65,8 +65,9 @@ function OrderSuccess() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <div>
-                  <p className="font-semibold text-gray-900">Cash on Delivery</p>
-                  <p className="text-sm text-gray-600">Pay when you receive your order</p>
+                  <p className="font-semibold text-gray-900">Pay via EasyPaisa</p>
+                  <p className="text-sm text-gray-600">Muhammad Awais Raza: 03311339541</p>
+                  <p className="text-sm text-gray-600">Send payment and share screenshot for confirmation</p>
                 </div>
               </div>
             </div>

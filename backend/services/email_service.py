@@ -63,7 +63,8 @@ class EmailService:
                         
                         <div class="order-details">
                             <h3>Order Number: #{order_number}</h3>
-                            <p><strong>Payment Method:</strong> Cash on Delivery (COD)</p>
+                            <p><strong>Payment Method:</strong> EasyPaisa</p>
+                            <p><strong>EasyPaisa Account:</strong> Muhammad Awais Raza - 03311339541</p>
                             
                             <h4>Order Items:</h4>
             """
@@ -89,10 +90,11 @@ class EmailService:
                         
                         <h3>What's Next?</h3>
                         <ul>
-                            <li>We'll call you to confirm your order details</li>
+                            <li><strong>Send payment via EasyPaisa to: 03311339541 (Muhammad Awais Raza)</strong></li>
+                            <li>Send us a screenshot of the payment confirmation</li>
+                            <li>We'll confirm your order and start processing</li>
                             <li>Your order will be carefully packaged</li>
-                            <li>Delivery within 3-5 business days</li>
-                            <li>Pay cash when you receive your order</li>
+                            <li>Delivery within 3-5 business days after payment confirmation</li>
                         </ul>
                         
                         <p>If you have any questions, feel free to contact us.</p>
@@ -201,8 +203,9 @@ class EmailService:
                         </div>
                         
                         <div class="section">
-                            <p><strong>Payment Method:</strong> Cash on Delivery (COD)</p>
-                            <p style="color: #ea580c; font-weight: bold;">⚠️ Please contact the customer to confirm the order!</p>
+                            <p><strong>Payment Method:</strong> EasyPaisa</p>
+                            <p><strong>EasyPaisa Account:</strong> Muhammad Awais Raza - 03311339541</p>
+                            <p style="color: #ea580c; font-weight: bold;">⚠️ Please contact the customer to confirm payment and order!</p>
                         </div>
                     </div>
                 </div>
