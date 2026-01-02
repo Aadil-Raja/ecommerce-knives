@@ -35,18 +35,18 @@ function Cart() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-1 py-20 px-6">
+      <main className="flex-1 py-8 sm:py-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-6 sm:mb-8">Shopping Cart</h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cart.items.map((item) => (
-                <div key={item.productId} className="bg-white border border-gray-200 rounded p-6">
-                  <div className="flex gap-6">
+                <div key={item.productId} className="bg-white border border-gray-200 rounded p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {/* Product Image */}
-                    <div className="w-24 h-24 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
                       <img
                         src={getImageUrl(item.image)}
                         alt={item.name}
@@ -55,11 +55,11 @@ function Cart() {
                     </div>
 
                     {/* Product Details */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.name}</h3>
-                      <p className="text-xl font-bold text-orange-600 mb-4">{formatPrice(item.price)}</p>
+                    <div className="flex-1 text-center sm:text-left">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">{item.name}</h3>
+                      <p className="text-lg sm:text-xl font-bold text-orange-600 mb-4">{formatPrice(item.price)}</p>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                         {/* Quantity Controls */}
                         <div className="flex items-center border border-gray-300 rounded">
                           <button
@@ -87,8 +87,8 @@ function Cart() {
                       </div>
                     </div>
 
-                    {/* Item Total */}
-                    <div className="text-right">
+                    {/* Item Total - Mobile: Below content, Desktop: Right side */}
+                    <div className="text-center sm:text-right sm:flex-shrink-0">
                       <p className="text-lg font-bold text-gray-900">
                         {formatPrice(item.price * item.quantity)}
                       </p>
@@ -100,19 +100,19 @@ function Cart() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white border border-gray-200 rounded p-6 sticky top-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+              <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:sticky lg:top-24">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Order Summary</h2>
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-gray-700">
+                <div className="space-y-3 mb-4 sm:mb-6">
+                  <div className="flex justify-between text-sm sm:text-base text-gray-700">
                     <span>Subtotal ({cart.totalItems} items)</span>
                     <span>{formatPrice(cart.totalPrice)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-700">
+                  <div className="flex justify-between text-sm sm:text-base text-gray-700">
                     <span>Shipping</span>
                     <span className="text-green-600">FREE</span>
                   </div>
-                  <div className="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold text-gray-900">
+                  <div className="border-t border-gray-200 pt-3 flex justify-between text-lg sm:text-xl font-bold text-gray-900">
                     <span>Total</span>
                     <span className="text-orange-600">{formatPrice(cart.totalPrice)}</span>
                   </div>

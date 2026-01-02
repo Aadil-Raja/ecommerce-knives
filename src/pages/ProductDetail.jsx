@@ -59,10 +59,45 @@ function ProductDetail() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
-            <p className="text-gray-600 text-xl">Loading product...</p>
+        <main className="flex-1 py-20 px-6 min-h-[600px]">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col items-center justify-center min-h-[500px]">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-orange-600 mb-6"></div>
+                <p className="text-gray-600 text-xl mb-4">Loading product...</p>
+                <p className="text-gray-500 text-sm mb-12">Please wait while we fetch the product details</p>
+                
+                {/* Skeleton Loading Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full max-w-7xl mt-12">
+                  {/* Left side skeleton - Images */}
+                  <div className="flex gap-4">
+                    <div className="flex flex-col gap-3">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="w-24 h-24 bg-gray-200 rounded animate-pulse"></div>
+                      ))}
+                    </div>
+                    <div className="flex-1">
+                      <div className="w-full h-96 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Right side skeleton - Details */}
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                      <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                    </div>
+                    <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
         <Footer />

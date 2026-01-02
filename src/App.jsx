@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AdminProvider } from './context/AdminContext';
+import ScrollToTop from './components/ScrollToTop';
 import ComingSoon from './pages/ComingSoon';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -26,9 +27,10 @@ function App() {
     <CartProvider>
       <AdminProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<ComingSoon />} />
+            <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/category/:categoryName" element={<Category />} />

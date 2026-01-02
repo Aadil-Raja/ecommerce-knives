@@ -35,8 +35,8 @@ function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4 uppercase tracking-wider text-sm">Contact</h3>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li>Email: info@sharplabbyowais.com</li>
-              <li>Phone: +92-312-1078541</li>
+              <li>Email: sharplabbyowais@gmail.com</li>
+              <li>Phone: 03311339541</li>
             </ul>
           </div>
         </div>

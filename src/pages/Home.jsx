@@ -47,15 +47,30 @@ function Home() {
         <BannerSlider />
 
         {/* Featured Products */}
-        <section className="py-10 sm:py-16 md:py-20 px-4 sm:px-6 bg-white min-h-[400px] sm:min-h-[500px] md:min-h-[600px]">
+        <section className="py-10 sm:py-16 md:py-20 px-4 sm:px-6 bg-white min-h-[600px] sm:min-h-[700px] md:min-h-[800px]">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8 sm:mb-10 md:mb-12">Featured Products</h2>
             {!imagesLoaded || featuredProducts.length === 0 ? (
-              <div className="flex justify-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
+                <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-orange-600 mb-6"></div>
+                <p className="text-gray-600 text-xl mb-4">Loading featured products...</p>
+                <p className="text-gray-500 text-sm">Please wait while we fetch the latest products</p>
+                
+                {/* Skeleton Loading Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mt-12 w-full">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="bg-white border border-gray-200 rounded overflow-hidden animate-pulse">
+                      <div className="aspect-square bg-gray-200"></div>
+                      <div className="p-4 sm:p-5 md:p-6">
+                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
               {featuredProducts.map((product) => (
                 <Link 
                   key={product.id} 

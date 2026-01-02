@@ -35,8 +35,7 @@ function About() {
             <h2 className="text-3xl font-semibold text-white mt-12 mb-4">Why Choose Us</h2>
             <p className="text-lg leading-relaxed">
               When you choose Sharp Lab, you're choosing knives that will last a lifetime. We use only 
-              premium materials, employ traditional techniques combined with modern technology, and back 
-              every product with our lifetime warranty. Our knives are trusted by professional chefs and 
+              premium materials, employ traditional techniques combined with modern technology. Our knives are trusted by professional chefs and 
               home cooks alike for their exceptional performance and durability.
             </p>
           </div>
