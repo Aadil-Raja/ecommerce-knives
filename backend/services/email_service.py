@@ -12,7 +12,7 @@ def format_price(price):
 
 class EmailService:
     @staticmethod
-    def send_order_confirmation(customer_email, customer_name, order_number, items, total_amount):
+    def send_order_confirmation(customer_email, customer_name, order_number, items, total_amount, payment_method='COD'):
         """Send order confirmation email to customer"""
         
         # Email configuration from environment variables
@@ -63,8 +63,8 @@ class EmailService:
                         
                         <div class="order-details">
                             <h3>Order Number: #{order_number}</h3>
-                            <p><strong>Payment Method:</strong> EasyPaisa</p>
-                            <p><strong>EasyPaisa Account:</strong> Muhammad Awais Raza - 03311339541</p>
+                            <p><strong>Payment Method:</strong> {payment_method}</p>
+                            {f'<p><strong>EasyPaisa Account:</strong> Muhammad Awais Raza - 03311339541</p>' if payment_method == 'EasyPaisa' else ''}
                             
                             <h4>Order Items:</h4>
             """
@@ -82,12 +82,9 @@ class EmailService:
                             </div>
                 """
             
-            html_body += f"""
-                            <div class="total">
-                                Total Amount: {format_price(total_amount)}
-                            </div>
-                        </div>
-                        
+            # Create payment-specific instructions
+            if payment_method == 'EasyPaisa':
+                payment_instructions = """
                         <h3>What's Next?</h3>
                         <ul>
                             <li><strong>Send payment via EasyPaisa to: 03311339541 (Muhammad Awais Raza)</strong></li>
@@ -96,6 +93,27 @@ class EmailService:
                             <li>Your order will be carefully packaged</li>
                             <li>Delivery within 3-5 business days after payment confirmation</li>
                         </ul>
+                """
+            else:  # COD
+                payment_instructions = """
+                        <h3>What's Next?</h3>
+                        <ul>
+                            <li><strong>No advance payment required - Pay when delivered</strong></li>
+                            <li>We'll confirm your order and start processing</li>
+                            <li>Your order will be carefully packaged</li>
+                            <li>Our delivery person will contact you before delivery</li>
+                            <li>Pay the exact amount when you receive your order</li>
+                            <li>Delivery within 3-5 business days</li>
+                        </ul>
+                """
+            
+            html_body += f"""
+                            <div class="total">
+                                Total Amount: {format_price(total_amount)}
+                            </div>
+                        </div>
+                        
+                        {payment_instructions}
                         
                         <p>If you have any questions, feel free to contact us.</p>
                     </div>
@@ -129,7 +147,7 @@ class EmailService:
             return False
     
     @staticmethod
-    def send_admin_notification(order_number, customer_name, customer_phone, customer_email, items, total_amount, delivery_address, city):
+    def send_admin_notification(order_number, customer_name, customer_phone, customer_email, items, total_amount, delivery_address, city, payment_method='COD'):
         """Send order notification to admin"""
         
         mail_username = os.getenv('MAIL_USERNAME')
@@ -178,6 +196,7 @@ class EmailService:
                             <p><strong>Email:</strong> {customer_email}</p>
                             <p><strong>Address:</strong> {delivery_address}</p>
                             <p><strong>City:</strong> {city}</p>
+                            <p><strong>Payment Method:</strong> {payment_method}</p>
                         </div>
                         
                         <div class="section">
@@ -196,17 +215,31 @@ class EmailService:
                             </div>
                 """
             
+            # Create payment-specific admin instructions
+            if payment_method == 'EasyPaisa':
+                admin_instructions = f"""
+                        <div class="section">
+                            <p><strong>Payment Method:</strong> EasyPaisa</p>
+                            <p><strong>EasyPaisa Account:</strong> Muhammad Awais Raza - 03311339541</p>
+                            <p style="color: #ea580c; font-weight: bold;">⚠️ Please contact the customer to confirm payment and order!</p>
+                        </div>
+                """
+            else:  # COD
+                admin_instructions = f"""
+                        <div class="section">
+                            <p><strong>Payment Method:</strong> Cash on Delivery (COD)</p>
+                            <p style="color: #16a34a; font-weight: bold;">✅ No advance payment required - Customer will pay on delivery</p>
+                            <p style="color: #ea580c; font-weight: bold;">📞 Please contact the customer to confirm order and delivery details!</p>
+                        </div>
+                """
+            
             html_body += f"""
                             <div class="total">
                                 Total Amount: {format_price(total_amount)}
                             </div>
                         </div>
                         
-                        <div class="section">
-                            <p><strong>Payment Method:</strong> EasyPaisa</p>
-                            <p><strong>EasyPaisa Account:</strong> Muhammad Awais Raza - 03311339541</p>
-                            <p style="color: #ea580c; font-weight: bold;">⚠️ Please contact the customer to confirm payment and order!</p>
-                        </div>
+                        {admin_instructions}
                     </div>
                 </div>
             </body>

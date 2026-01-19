@@ -51,14 +51,14 @@ class Product:
     
     @staticmethod
     def get_featured_lightweight():
-        """Get only featured products with lightweight data"""
+        """Get only featured products with lightweight data ordered by featured_order"""
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('''
-            SELECT p.id, p.name, p.price, p.is_featured, p.stock
+            SELECT p.id, p.name, p.price, p.is_featured, p.stock, p.featured_order
             FROM products p
             WHERE p.is_featured = TRUE
-            ORDER BY p.created_at DESC
+            ORDER BY p.featured_order ASC, p.created_at DESC
         ''')
         products = cur.fetchall()
         cur.close()
@@ -200,3 +200,110 @@ class Product:
         cur.close()
         conn.close()
         return Product._add_images_to_products(products)
+
+    @staticmethod
+    def get_featured_for_admin():
+        """Get featured products for admin management with full details"""
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT p.*, c.name as category_name, c.slug as category_slug
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.is_featured = TRUE
+            ORDER BY p.featured_order ASC, p.created_at DESC
+        ''')
+        products = cur.fetchall()
+        cur.close()
+        conn.close()
+        return Product._add_images_to_products(products)
+
+    @staticmethod
+    def update_featured_order(product_id, new_order):
+        """Update the featured order of a product with validation"""
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            # Validate order (must be positive, max 999)
+            if new_order < 1:
+                new_order = 1
+            elif new_order > 999:
+                new_order = 999
+            
+            # Check if product exists and is featured
+            cur.execute('SELECT is_featured FROM products WHERE id = %s', (product_id,))
+            product = cur.fetchone()
+            
+            if not product:
+                raise ValueError("Product not found")
+            
+            if not product['is_featured']:
+                raise ValueError("Product is not featured")
+            
+            # Update the featured order
+            cur.execute('''
+                UPDATE products 
+                SET featured_order = %s, updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            ''', (new_order, product_id))
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            cur.close()
+            conn.close()
+            raise e
+
+    @staticmethod
+    def set_featured_status(product_id, is_featured, featured_order=None):
+        """Set featured status and order for a product"""
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            if is_featured:
+                # If setting as featured, determine order
+                if featured_order is None:
+                    # Get the next available order
+                    cur.execute('''
+                        SELECT COALESCE(MAX(featured_order), 0) + 1 as next_order
+                        FROM products 
+                        WHERE is_featured = TRUE
+                    ''')
+                    result = cur.fetchone()
+                    featured_order = result['next_order']
+                
+                # Validate order
+                if featured_order < 1:
+                    featured_order = 1
+                elif featured_order > 999:
+                    featured_order = 999
+                
+                cur.execute('''
+                    UPDATE products 
+                    SET is_featured = %s, featured_order = %s, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                ''', (is_featured, featured_order, product_id))
+            else:
+                # If removing from featured, set order to default
+                cur.execute('''
+                    UPDATE products 
+                    SET is_featured = %s, featured_order = 999, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                ''', (is_featured, product_id))
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            cur.close()
+            conn.close()
+            raise e

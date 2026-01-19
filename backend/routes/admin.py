@@ -44,9 +44,11 @@ def admin_logout():
 
 @admin_bp.route('/check-auth', methods=['GET'])
 def check_auth():
+    print(f"Auth check - Session: {dict(session)}")
+    print(f"Has admin_logged_in: {'admin_logged_in' in session}")
+    
     if 'admin_logged_in' in session:
         return jsonify({'authenticated': True, 'email': session.get('admin_email')})
-    return jsonify({'authenticated': False})
 
 # Dashboard Stats
 @admin_bp.route('/dashboard', methods=['GET'])
@@ -381,6 +383,17 @@ def update_order_status(order_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@admin_bp.route('/orders/<int:order_id>', methods=['DELETE'])
+@admin_required
+def delete_order(order_id):
+    try:
+        from models.order import Order
+        
+        Order.delete(order_id)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
 # Banners Management
 @admin_bp.route('/banners', methods=['GET'])
 @admin_required
@@ -556,6 +569,52 @@ def delete_product_image(image_id):
         cur.close()
         conn.close()
         
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# Featured Products Management
+@admin_bp.route('/featured-products', methods=['GET'])
+@admin_required
+def get_featured_products():
+    try:
+        from models.product import Product
+        products = Product.get_featured_for_admin()
+        return jsonify(products)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@admin_bp.route('/featured-products/<int:product_id>/order', methods=['PUT'])
+@admin_required
+def update_featured_order(product_id):
+    try:
+        from models.product import Product
+        data = request.get_json()
+        new_order = data.get('featured_order')
+        
+        if new_order is None:
+            return jsonify({'error': 'featured_order is required'}), 400
+        
+        try:
+            new_order = int(new_order)
+        except (ValueError, TypeError):
+            return jsonify({'error': 'featured_order must be a number'}), 400
+        
+        Product.update_featured_order(product_id, new_order)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@admin_bp.route('/featured-products/<int:product_id>/status', methods=['PUT'])
+@admin_required
+def update_featured_status(product_id):
+    try:
+        from models.product import Product
+        data = request.get_json()
+        is_featured = data.get('is_featured', False)
+        featured_order = data.get('featured_order')
+        
+        Product.set_featured_status(product_id, is_featured, featured_order)
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'error': str(e)}), 400

@@ -16,7 +16,8 @@ function Checkout() {
     email: '',
     address: '',
     city: '',
-    notes: ''
+    notes: '',
+    paymentMethod: 'COD' // Default to COD
   });
   const [errors, setErrors] = useState({});
 
@@ -79,7 +80,7 @@ function Checkout() {
         customer: formData,
         items: cart.items,
         totalAmount: cart.totalPrice,
-        paymentMethod: 'EasyPaisa'
+        paymentMethod: formData.paymentMethod
       };
 
       const data = await api.createOrder(orderData);
@@ -208,6 +209,42 @@ function Checkout() {
                       placeholder="Any special instructions for delivery"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-gray-700 font-semibold mb-2">
+                      Payment Method <span className="text-red-600">*</span>
+                    </label>
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="cod"
+                          name="paymentMethod"
+                          value="COD"
+                          checked={formData.paymentMethod === 'COD'}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
+                        />
+                        <label htmlFor="cod" className="ml-3 block text-sm font-medium text-gray-700">
+                          Cash on Delivery (COD)
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="easypaisa"
+                          name="paymentMethod"
+                          value="EasyPaisa"
+                          checked={formData.paymentMethod === 'EasyPaisa'}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
+                        />
+                        <label htmlFor="easypaisa" className="ml-3 block text-sm font-medium text-gray-700">
+                          EasyPaisa
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </form>
             </div>
@@ -245,15 +282,31 @@ function Checkout() {
                   </div>
                 </div>
 
-                <div className="bg-orange-50 border border-orange-200 rounded p-4 mb-6">
+                <div className={`border rounded p-4 mb-6 ${
+                  formData.paymentMethod === 'EasyPaisa' 
+                    ? 'bg-orange-50 border-orange-200' 
+                    : 'bg-green-50 border-green-200'
+                }`}>
                   <div className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-orange-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className={`w-5 h-5 mt-0.5 ${
+                      formData.paymentMethod === 'EasyPaisa' ? 'text-orange-600' : 'text-green-600'
+                    }`} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                     <div>
-                      <p className="text-sm font-semibold text-orange-900">Pay via EasyPaisa</p>
-                      <p className="text-xs text-orange-700 mt-1">Muhammad Awais Raza: 03311339541</p>
-                      <p className="text-xs text-orange-700">Send payment and we'll confirm your order</p>
+                      {formData.paymentMethod === 'EasyPaisa' ? (
+                        <>
+                          <p className="text-sm font-semibold text-orange-900">Pay via EasyPaisa</p>
+                          <p className="text-xs text-orange-700 mt-1">Muhammad Awais Raza: 03311339541</p>
+                          <p className="text-xs text-orange-700">Send payment and we'll confirm your order</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-semibold text-green-900">Cash on Delivery (COD)</p>
+                          <p className="text-xs text-green-700 mt-1">Pay when your order is delivered</p>
+                          <p className="text-xs text-green-700">No advance payment required</p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

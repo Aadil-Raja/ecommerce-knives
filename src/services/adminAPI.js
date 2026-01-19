@@ -110,6 +110,31 @@ class AdminAPI {
     });
   }
 
+  async deleteOrder(id) {
+    return this.request(`/admin/orders/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Featured Products
+  async getFeaturedProducts() {
+    return this.request('/admin/featured-products');
+  }
+
+  async updateFeaturedOrder(id, featuredOrder) {
+    return this.request(`/admin/featured-products/${id}/order`, {
+      method: 'PUT',
+      body: { featured_order: featuredOrder },
+    });
+  }
+
+  async updateFeaturedStatus(id, isFeatured, featuredOrder = null) {
+    return this.request(`/admin/featured-products/${id}/status`, {
+      method: 'PUT',
+      body: { is_featured: isFeatured, featured_order: featuredOrder },
+    });
+  }
+
   // Banners
   async getBanners() {
     return this.request('/admin/banners');

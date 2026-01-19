@@ -13,11 +13,12 @@ def create_order():
         customer_data = data.get('customer')
         items = data.get('items')
         total_amount = data.get('totalAmount')
+        payment_method = data.get('paymentMethod', 'COD')  # Default to COD if not specified
         
         if not customer_data or not items or not total_amount:
             return jsonify({'error': 'Missing required fields'}), 400
         
-        result = Order.create(customer_data, items, total_amount)
+        result = Order.create(customer_data, items, total_amount, payment_method)
         print(f"Order created successfully: {result}")
         
         return jsonify(result), 201

@@ -11,7 +11,7 @@ class Order:
         return 'ORD' + ''.join(random.choices(string.digits, k=8))
     
     @staticmethod
-    def create(customer_data, items, total_amount):
+    def create(customer_data, items, total_amount, payment_method='COD'):
         """Create a new order with items"""
         conn = get_db_connection()
         cur = conn.cursor()
@@ -37,7 +37,7 @@ class Order:
                 customer_data['city'],
                 customer_data.get('notes', ''),
                 total_amount,
-                'COD'
+                payment_method
             ))
             
             order = cur.fetchone()
@@ -79,7 +79,8 @@ class Order:
                             customer_name=customer_data['fullName'],
                             order_number=order_number,
                             items=items,
-                            total_amount=total_amount
+                            total_amount=total_amount,
+                            payment_method=payment_method
                         )
                     except Exception as e:
                         print(f"Failed to send customer email: {e}")
@@ -94,7 +95,8 @@ class Order:
                         items=items,
                         total_amount=total_amount,
                         delivery_address=customer_data['address'],
-                        city=customer_data['city']
+                        city=customer_data['city'],
+                        payment_method=payment_method
                     )
                 except Exception as e:
                     print(f"Failed to send admin notification: {e}")
@@ -152,3 +154,28 @@ class Order:
         conn.close()
         
         return orders
+    
+    @staticmethod
+    def delete(order_id):
+        """Delete an order and its items"""
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            # Delete order items first (due to foreign key constraint)
+            cur.execute('DELETE FROM order_items WHERE order_id = %s', (order_id,))
+            
+            # Delete the order
+            cur.execute('DELETE FROM orders WHERE id = %s', (order_id,))
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            cur.close()
+            conn.close()
+            raise e

@@ -17,6 +17,7 @@ const AdminProducts = () => {
     barcode: '',
     stock: '',
     is_featured: false,
+    featured_order: 999,
     specifications: {}
   });
   const [specifications, setSpecifications] = useState([{ key: '', value: '', order: 1 }]);
@@ -158,6 +159,7 @@ const AdminProducts = () => {
       barcode: product.barcode || '',
       stock: product.stock?.toString() || '0',
       is_featured: product.is_featured || false,
+      featured_order: product.featured_order || 999,
       image_name: product.image_name || '',
       specifications: product.specifications || {}
     });
@@ -166,16 +168,24 @@ const AdminProducts = () => {
     const specsArray = Object.entries(product.specifications || {}).map(([key, value]) => {
       // Handle both old format (string) and new format (object with order)
       if (typeof value === 'string') {
-        return { key, value, order: 999 }; // Legacy format - assign high order
+        return { key, value, order: 999 }; // Legacy format - will be auto-converted
       }
       return {
         key,
         value: value.value || value,
-        order: value.order || 999
+        order: value.order || 999 // Will be auto-converted if 999
       };
     }).sort((a, b) => a.order - b.order); // Sort by order for editing
     
-    setSpecifications(specsArray.length > 0 ? specsArray : [{ key: '', value: '', order: 1 }]);
+    // Auto-convert legacy 999 orders to valid range (1-100)
+    const convertedSpecs = specsArray.map((spec, index) => {
+      if (spec.order > 100) {
+        return { ...spec, order: index + 1 }; // Assign sequential order
+      }
+      return spec;
+    });
+    
+    setSpecifications(convertedSpecs.length > 0 ? convertedSpecs : [{ key: '', value: '', order: 1 }]);
     setShowModal(true);
   };
 
@@ -200,6 +210,7 @@ const AdminProducts = () => {
       barcode: '',
       stock: '',
       is_featured: false,
+      featured_order: 999,
       specifications: {}
     });
     setSpecifications([{ key: '', value: '', order: 1 }]);
@@ -231,22 +242,47 @@ const AdminProducts = () => {
       }
       
       // Validate order input
-      const orderValue = parseInt(value);
+      let orderValue = parseInt(value);
       
       // Reject invalid inputs (but allow empty)
-      if (isNaN(orderValue) || orderValue <= 0 || orderValue > 100) {
+      if (isNaN(orderValue) || orderValue <= 0) {
         return; // Don't update if invalid
       }
       
-      // Check for duplicates and auto-resolve
+      // Handle legacy values (999) by converting to valid range
+      if (orderValue > 100) {
+        // Find the next available order in valid range (1-100)
+        const existingOrders = updated
+          .filter((_, i) => i !== index)
+          .map(spec => spec.order)
+          .filter(order => order !== '' && !isNaN(order) && order <= 100);
+        
+        // Find next available slot from 1-100
+        orderValue = 1;
+        while (existingOrders.includes(orderValue) && orderValue <= 100) {
+          orderValue++;
+        }
+        
+        // If all 1-100 are taken, use the input value but cap at 100
+        if (orderValue > 100) {
+          orderValue = 100;
+        }
+      }
+      
+      // Check for duplicates and auto-resolve within valid range
       const existingOrders = updated
         .filter((_, i) => i !== index)
         .map(spec => spec.order)
-        .filter(order => order !== '' && !isNaN(order)); // Ignore empty orders
+        .filter(order => order !== '' && !isNaN(order) && order <= 100);
       
       let finalOrder = orderValue;
-      while (existingOrders.includes(finalOrder)) {
+      while (existingOrders.includes(finalOrder) && finalOrder <= 100) {
         finalOrder++;
+      }
+      
+      // Cap at 100
+      if (finalOrder > 100) {
+        finalOrder = 100;
       }
       
       updated[index][field] = finalOrder;
@@ -536,6 +572,23 @@ const AdminProducts = () => {
                     Featured Product
                   </label>
                 </div>
+
+                {formData.is_featured && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Featured Order</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="999"
+                      value={formData.featured_order}
+                      onChange={(e) => setFormData({...formData, featured_order: parseInt(e.target.value) || 999})}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Order for featured products display (1-999). Lower numbers appear first.
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
