@@ -14,6 +14,7 @@ const AdminLayout = () => {
     { name: 'Categories', href: '/admin/categories', icon: '📂' },
     { name: 'Orders', href: '/admin/orders', icon: '🛒' },
     { name: 'Banners', href: '/admin/banners', icon: '🖼️' },
+    { name: 'Newsletter', href: '/admin/newsletter', icon: '📧' },
   ];
 
   const handleLogout = async () => {

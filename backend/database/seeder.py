@@ -106,6 +106,16 @@ def initialize_database():
             );
         """)
         
+        # Create Newsletter Subscribers Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE
+            );
+        """)
+        
         # Create indexes for better performance
         indexes = [
             "CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);",
@@ -118,7 +128,9 @@ def initialize_database():
             "CREATE INDEX IF NOT EXISTS idx_banners_order ON banners(display_order);",
             "CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id);",
             "CREATE INDEX IF NOT EXISTS idx_product_images_main ON product_images(is_main);",
-            "CREATE INDEX IF NOT EXISTS idx_product_images_order ON product_images(display_order);"
+            "CREATE INDEX IF NOT EXISTS idx_product_images_order ON product_images(display_order);",
+            "CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers(email);",
+            "CREATE INDEX IF NOT EXISTS idx_newsletter_active ON newsletter_subscribers(is_active);"
         ]
         
         for index_sql in indexes:

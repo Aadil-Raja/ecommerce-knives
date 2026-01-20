@@ -247,6 +247,27 @@ class AdminAPI {
 
     return response.json();
   }
+
+  // Newsletter Management
+  async getNewsletterSubscribers() {
+    return this.request('/admin/newsletter/subscribers');
+  }
+
+  async deleteNewsletterSubscriber(subscriberId) {
+    return this.request(`/admin/newsletter/subscribers/${subscriberId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async toggleNewsletterSubscriberStatus(subscriberId) {
+    return this.request(`/admin/newsletter/subscribers/${subscriberId}/toggle`, {
+      method: 'PUT',
+    });
+  }
+
+  async getNewsletterStats() {
+    return this.request('/admin/newsletter/stats');
+  }
 }
 
 export const adminAPI = new AdminAPI();

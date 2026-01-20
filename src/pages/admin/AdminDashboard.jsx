@@ -3,6 +3,7 @@ import { adminAPI } from '../../services/adminAPI';
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
+  const [newsletterStats, setNewsletterStats] = useState({ total_subscribers: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -11,8 +12,13 @@ const AdminDashboard = () => {
 
   const loadDashboard = async () => {
     try {
-      const data = await adminAPI.getDashboard();
-      setDashboardData(data);
+      const [dashboardData, newsletterData] = await Promise.all([
+        adminAPI.getDashboard(),
+        adminAPI.getNewsletterStats()
+      ]);
+      
+      setDashboardData(dashboardData);
+      setNewsletterStats(newsletterData);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
     } finally {
@@ -35,7 +41,7 @@ const AdminDashboard = () => {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="text-2xl mr-3">📦</div>
@@ -72,6 +78,16 @@ const AdminDashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Active Banners</p>
               <p className="text-2xl font-bold text-gray-900">{stats.active_banners}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <div className="text-2xl mr-3">📧</div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Newsletter</p>
+              <p className="text-2xl font-bold text-gray-900">{newsletterStats.total_subscribers}</p>
             </div>
           </div>
         </div>

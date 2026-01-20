@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AdminProvider } from './context/AdminContext';
 import ScrollToTop from './components/ScrollToTop';
-import ComingSoon from './pages/ComingSoon';
 import Home from './pages/Home';
 import About from './pages/About';
 import Category from './pages/Category';
@@ -21,6 +20,7 @@ import AdminFeaturedProducts from './pages/admin/AdminFeaturedProducts';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminBanners from './pages/admin/AdminBanners';
+import AdminNewsletter from './pages/admin/AdminNewsletter';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 
 function App() {
@@ -54,6 +54,7 @@ function App() {
               <Route path="categories" element={<AdminCategories />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="banners" element={<AdminBanners />} />
+              <Route path="newsletter" element={<AdminNewsletter />} />
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
             </Route>
             

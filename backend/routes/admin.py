@@ -761,3 +761,52 @@ def upload_product_images_bulk(product_id):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+# Newsletter Management
+@admin_bp.route('/newsletter/subscribers', methods=['GET'])
+@admin_required
+def get_newsletter_subscribers():
+    try:
+        from models.newsletter import Newsletter
+        subscribers = Newsletter.get_all_subscribers()
+        return jsonify(subscribers)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@admin_bp.route('/newsletter/subscribers/<int:subscriber_id>', methods=['DELETE'])
+@admin_required
+def delete_newsletter_subscriber(subscriber_id):
+    try:
+        from models.newsletter import Newsletter
+        success = Newsletter.delete_subscriber(subscriber_id)
+        
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'error': 'Subscriber not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@admin_bp.route('/newsletter/subscribers/<int:subscriber_id>/toggle', methods=['PUT'])
+@admin_required
+def toggle_newsletter_subscriber_status(subscriber_id):
+    try:
+        from models.newsletter import Newsletter
+        result = Newsletter.toggle_subscriber_status(subscriber_id)
+        
+        if result['success']:
+            return jsonify(result)
+        else:
+            return jsonify({'error': result['message']}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@admin_bp.route('/newsletter/stats', methods=['GET'])
+@admin_required
+def get_newsletter_stats():
+    try:
+        from models.newsletter import Newsletter
+        total_subscribers = Newsletter.get_subscriber_count()
+        return jsonify({'total_subscribers': total_subscribers})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
