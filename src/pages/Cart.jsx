@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { useCart } from '../context/CartContext';
 import { getImageUrl, formatPrice } from '../utils/config';
 
@@ -138,6 +139,9 @@ function Cart() {
       </main>
 
       <Footer />
+      
+      {/* Fixed WhatsApp Button */}
+      <WhatsAppButton />
     </div>
   );
 }

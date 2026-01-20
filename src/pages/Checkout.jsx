@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { formatPrice } from '../utils/config';
@@ -330,6 +331,9 @@ function Checkout() {
       </main>
 
       <Footer />
+      
+      {/* Fixed WhatsApp Button */}
+      <WhatsAppButton />
     </div>
   );
 }

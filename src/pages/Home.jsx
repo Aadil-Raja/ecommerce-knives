@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BannerSlider from '../components/BannerSlider';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { api } from '../services/api';
 import { getImageUrl, formatPrice, debugLog } from '../utils/config';
 
@@ -123,6 +124,9 @@ function Home() {
       </main>
 
       <Footer />
+      
+      {/* Fixed WhatsApp Button */}
+      <WhatsAppButton />
     </div>
   );
 }

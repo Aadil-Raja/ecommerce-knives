@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { getImageUrl, formatPrice, debugLog } from '../utils/config';
@@ -321,6 +322,9 @@ function ProductDetail() {
           </div>
         </div>
       )}
+      
+      {/* Fixed WhatsApp Button */}
+      <WhatsAppButton />
     </div>
   );
 }

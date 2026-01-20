@@ -22,17 +22,8 @@ app.url_map.strict_slashes = False
 # Configure session
 app.secret_key = os.getenv('SECRET_KEY', 'your-super-secret-key-for-sessions')
 
-# Configure session for local development
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Changed from 'None' to 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False  # Set to False for local HTTP development
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-
-# More permissive CORS for local development
-CORS(app, 
-     supports_credentials=True,
-     origins="*",  # Allow all origins for local development
-     allow_headers=['Content-Type', 'Authorization', 'Access-Control-Allow-Credentials'],
-     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+# Simple CORS - allow everything for development
+CORS(app, supports_credentials=True)
 
 # Register blueprints
 app.register_blueprint(products_bp, url_prefix='/api/products')
