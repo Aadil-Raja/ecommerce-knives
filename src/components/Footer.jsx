@@ -71,12 +71,35 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Customer Care */}
           <div>
-            <h3 className="text-white font-semibold mb-4 uppercase tracking-wider text-sm">Contact</h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
-              <li>Email: sharplabbyowais@gmail.com</li>
-              <li>Phone: 03311339541</li>
+            <h3 className="text-white font-semibold mb-4 uppercase tracking-wider text-sm">Customer Care</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/refund-policy" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Refund & Exchange Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-policy" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms-of-service" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact-us" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -118,6 +141,15 @@ function Footer() {
                 {message}
               </div>
             )}
+
+            {/* Contact Info */}
+            <div className="mt-6 pt-6 border-t border-zinc-800">
+              <h4 className="text-white font-semibold mb-3 uppercase tracking-wider text-xs">Contact</h4>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li>Email: sharplabbyowais@gmail.com</li>
+                <li>Phone: 03311339541</li>
+              </ul>
+            </div>
           </div>
         </div>
 
