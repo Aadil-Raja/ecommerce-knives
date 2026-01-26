@@ -51,18 +51,25 @@ class Order:
                 quantity = int(item['quantity'])
                 subtotal = price * quantity
                 
+                # Get original price and discount info
+                original_price = float(item.get('originalPrice', price))
+                discount_amount = float(item.get('discountAmount', 0))
+                
                 cur.execute('''
                     INSERT INTO order_items (
-                        order_id, product_id, product_name, price, quantity, subtotal
+                        order_id, product_id, product_name, price, quantity, subtotal,
+                        original_price, discount_amount
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ''', (
                     order_id,
                     item['productId'],
                     item['name'],
                     price,
                     quantity,
-                    subtotal
+                    subtotal,
+                    original_price,
+                    discount_amount * quantity  # Total discount for this item
                 ))
             
             conn.commit()

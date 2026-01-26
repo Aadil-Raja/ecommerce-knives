@@ -1,11 +1,46 @@
 from config.database import get_db_connection
 from models.product_image import ProductImage
+from datetime import datetime
 
 class Product:
+    @staticmethod
+    def _add_discount_info_to_product(product):
+        """Add discount information to a product dict"""
+        if product:
+            from models.discount import Discount
+            
+            # Get active discount for this product
+            discount = Discount.get_active_discount_for_product(product['id'])
+            
+            if discount:
+                original_price = float(product['price'])
+                discount_percentage = float(discount['discount_percentage'])
+                discount_amount = original_price * (discount_percentage / 100)
+                final_price = round(original_price - discount_amount, 2)
+                
+                product['has_active_discount'] = True
+                product['original_price'] = original_price
+                product['final_price'] = final_price
+                product['discount_amount'] = round(discount_amount, 2)
+                product['savings'] = round(discount_amount, 2)
+                product['discount_percentage'] = discount_percentage
+            else:
+                product['has_active_discount'] = False
+                product['original_price'] = float(product['price'])
+                product['final_price'] = float(product['price'])
+                product['discount_amount'] = 0
+                product['savings'] = 0
+                product['discount_percentage'] = 0
+        
+        return product
+
     @staticmethod
     def _add_images_to_product(product):
         """Add image information to a product dict"""
         if product:
+            # Add discount info first
+            product = Product._add_discount_info_to_product(product)
+            
             # Get images from product_images table
             product_images = ProductImage.get_by_product_id(product['id'])
             
@@ -27,6 +62,9 @@ class Product:
         products_with_images = []
         for p in products:
             product = dict(p)
+            # Add discount info first
+            product = Product._add_discount_info_to_product(product)
+            
             # Get only the main image for listings
             product_images = ProductImage.get_by_product_id(product['id'])
             
@@ -307,3 +345,14 @@ class Product:
             cur.close()
             conn.close()
             raise e
+    @staticmethod
+    def apply_discount(product_id, discount_percentage, created_by='admin'):
+        """Apply discount to a product using the discount table"""
+        from models.discount import Discount
+        return Discount.create_discount(product_id, discount_percentage, created_by)
+
+    @staticmethod
+    def remove_discount(product_id):
+        """Remove discount from a product using the discount table"""
+        from models.discount import Discount
+        return Discount.remove_discount(product_id)

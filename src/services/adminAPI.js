@@ -103,6 +103,10 @@ class AdminAPI {
     return this.request('/admin/orders');
   }
 
+  async getOrderDetails(id) {
+    return this.request(`/admin/orders/${id}`);
+  }
+
   async updateOrderStatus(id, status) {
     return this.request(`/admin/orders/${id}/status`, {
       method: 'PUT',
@@ -304,6 +308,41 @@ class AdminAPI {
 
   async checkGalleryImageName(filename) {
     return this.request(`/gallery/admin/check-name/${encodeURIComponent(filename)}`);
+  }
+
+  // Discount Management
+  async applyDiscount(productId, discountData) {
+    return this.request(`/products/${productId}/discount`, {
+      method: 'POST',
+      body: discountData,
+    });
+  }
+
+  async removeDiscount(productId) {
+    return this.request(`/products/${productId}/discount`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getDiscountedProducts() {
+    return this.request('/products/discounts');
+  }
+
+  async getAllDiscountsAdmin() {
+    return this.request('/products/discounts/admin');
+  }
+
+  async toggleDiscountStatus(productId, isActive) {
+    return this.request(`/products/${productId}/discount/toggle`, {
+      method: 'PUT',
+      body: { is_active: isActive },
+    });
+  }
+
+  async deleteDiscountPermanently(productId) {
+    return this.request(`/products/${productId}/discount/delete`, {
+      method: 'DELETE',
+    });
   }
 }
 

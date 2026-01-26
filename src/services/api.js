@@ -65,4 +65,33 @@ export const api = {
     const response = await fetch(`${API_BASE_URL}/gallery`);
     return response.json();
   },
+
+  // Discounts
+  applyDiscount: async (productId, discountData) => {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/discount`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(discountData),
+    });
+    return response.json();
+  },
+
+  removeDiscount: async (productId) => {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/discount`, {
+      method: 'DELETE',
+    });
+    return response.json();
+  },
+
+  getDiscountedProducts: async () => {
+    const response = await fetch(`${API_BASE_URL}/products/discounts`);
+    return response.json();
+  },
+
+  getAllDiscountsAdmin: async () => {
+    const response = await fetch(`${API_BASE_URL}/products/discounts/admin`);
+    return response.json();
+  },
 };

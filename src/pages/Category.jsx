@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
+import ProductCard from '../components/ProductCard';
 import { api } from '../services/api';
 import { getImageUrl, formatPrice, debugLog, PRODUCTS_PER_PAGE } from '../utils/config';
 
@@ -225,28 +226,7 @@ function Category() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {products.map((product) => (
-                  <Link 
-                    key={product.id} 
-                    to={`/product/${product.id}`}
-                    className="bg-white border border-gray-200 rounded overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                  >
-                    <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                      <img 
-                        src={getImageUrl(product.main_image || product.image_name)} 
-                        alt={product.name}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onLoad={(e) => e.target.style.opacity = '1'}
-                        style={{ opacity: '0', transition: 'opacity 0.3s ease-in-out' }}
-                      />
-                    </div>
-                    <div className="p-4 text-center">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">{product.name}</h3>
-                      <div className="flex items-center justify-center">
-                        <span className="text-lg font-bold text-orange-600">{formatPrice(product.price)}</span>
-                      </div>
-                    </div>
-                  </Link>
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
               

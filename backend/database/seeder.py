@@ -39,6 +39,7 @@ def initialize_database():
                 image_name VARCHAR(255),
                 stock INTEGER DEFAULT 0,
                 is_featured BOOLEAN DEFAULT FALSE,
+                featured_order INTEGER DEFAULT 999,
                 specifications JSONB,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -74,6 +75,8 @@ def initialize_database():
                 price DECIMAL(10, 2) NOT NULL,
                 quantity INTEGER NOT NULL,
                 subtotal DECIMAL(10, 2) NOT NULL,
+                original_price DECIMAL(10, 2),
+                discount_amount DECIMAL(10, 2) DEFAULT 0.00,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
@@ -130,6 +133,19 @@ def initialize_database():
             );
         """)
         
+        # Create Discounts Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS discounts (
+                id SERIAL PRIMARY KEY,
+                product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+                discount_percentage DECIMAL(5,2) NOT NULL CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+                is_active BOOLEAN DEFAULT TRUE,
+                created_by VARCHAR(100) DEFAULT 'admin',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        
         # Create indexes for better performance
         indexes = [
             "CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);",
@@ -147,7 +163,10 @@ def initialize_database():
             "CREATE INDEX IF NOT EXISTS idx_newsletter_active ON newsletter_subscribers(is_active);",
             "CREATE INDEX IF NOT EXISTS idx_gallery_active ON gallery(is_active);",
             "CREATE INDEX IF NOT EXISTS idx_gallery_order ON gallery(display_order);",
-            "CREATE INDEX IF NOT EXISTS idx_gallery_image_name ON gallery(image_name);"
+            "CREATE INDEX IF NOT EXISTS idx_gallery_image_name ON gallery(image_name);",
+            "CREATE INDEX IF NOT EXISTS idx_discounts_product_id ON discounts(product_id);",
+            "CREATE INDEX IF NOT EXISTS idx_discounts_active ON discounts(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_discounts_product_active ON discounts(product_id, is_active);"
         ]
         
         for index_sql in indexes:

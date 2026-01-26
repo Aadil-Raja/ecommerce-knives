@@ -26,6 +26,11 @@ export const CartProvider = ({ children }) => {
     setCart((prevCart) => {
       const existingItem = prevCart.items.find(item => item.productId === product.id);
       
+      // Use discounted price if available, otherwise use regular price
+      const finalPrice = product.has_active_discount && product.final_price 
+        ? product.final_price 
+        : product.price;
+      
       let newItems;
       if (existingItem) {
         // Update quantity if item already exists
@@ -41,7 +46,10 @@ export const CartProvider = ({ children }) => {
           {
             productId: product.id,
             name: product.name,
-            price: product.price,
+            price: finalPrice,
+            originalPrice: product.original_price || product.price,
+            discountAmount: product.discount_amount || 0,
+            hasDiscount: product.has_active_discount || false,
             quantity: quantity,
             image: product.main_image || product.image_name,
             stock: product.stock

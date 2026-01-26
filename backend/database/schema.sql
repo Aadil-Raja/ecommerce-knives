@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS products (
     images TEXT[], -- Array of image filenames for multiple angles
     stock INTEGER DEFAULT 0,
     is_featured BOOLEAN DEFAULT FALSE,
+    featured_order INTEGER DEFAULT 999,
     specifications JSONB, -- Store product specifications as JSON
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -52,6 +53,8 @@ CREATE TABLE IF NOT EXISTS order_items (
     price DECIMAL(10, 2) NOT NULL,
     quantity INTEGER NOT NULL,
     subtotal DECIMAL(10, 2) NOT NULL,
+    original_price DECIMAL(10, 2),
+    discount_amount DECIMAL(10, 2) DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -87,6 +90,17 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
     is_active BOOLEAN DEFAULT TRUE
 );
 
+-- Discounts Table
+CREATE TABLE IF NOT EXISTS discounts (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+    discount_percentage DECIMAL(5,2) NOT NULL CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_by VARCHAR(100) DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for faster queries
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
@@ -101,5 +115,8 @@ CREATE INDEX IF NOT EXISTS idx_product_images_main ON product_images(is_main);
 CREATE INDEX IF NOT EXISTS idx_product_images_order ON product_images(display_order);
 CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers(email);
 CREATE INDEX IF NOT EXISTS idx_newsletter_active ON newsletter_subscribers(is_active);
+CREATE INDEX IF NOT EXISTS idx_discounts_product_id ON discounts(product_id);
+CREATE INDEX IF NOT EXISTS idx_discounts_active ON discounts(is_active);
+CREATE INDEX IF NOT EXISTS idx_discounts_product_active ON discounts(product_id, is_active);
 
 -- No sample data - clean database for production use

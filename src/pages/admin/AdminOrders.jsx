@@ -5,6 +5,8 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
@@ -40,9 +42,20 @@ const AdminOrders = () => {
     }
   };
 
-  const viewOrderDetails = (order) => {
+  const viewOrderDetails = async (order) => {
     setSelectedOrder(order);
     setShowModal(true);
+    setLoadingDetails(true);
+    
+    try {
+      const details = await adminAPI.getOrderDetails(order.id);
+      setOrderDetails(details);
+    } catch (error) {
+      console.error('Failed to load order details:', error);
+      alert('Failed to load order details');
+    } finally {
+      setLoadingDetails(false);
+    }
   };
 
   const handleDeleteOrder = (order) => {
@@ -147,6 +160,9 @@ const AdminOrders = () => {
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Discount
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -174,6 +190,15 @@ const AdminOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     Rs. {parseFloat(order.total_amount).toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {order.total_discount && parseFloat(order.total_discount) > 0 ? (
+                      <span className="text-green-600 font-medium">
+                        -Rs. {parseFloat(order.total_discount).toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">No discount</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
@@ -274,6 +299,96 @@ const AdminOrders = () => {
                     <div><strong>Last Updated:</strong> {new Date(selectedOrder.updated_at).toLocaleString()}</div>
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-6">
+                <h4 className="font-medium text-gray-900 mb-3">Order Items</h4>
+                {loadingDetails ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Loading order details...</p>
+                  </div>
+                ) : orderDetails && orderDetails.items ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Original Price</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Final Price</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Discount</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {orderDetails.items.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-4 py-2 text-sm text-gray-900">
+                              {item.product_name}
+                              {item.current_product_name && item.current_product_name !== item.product_name && (
+                                <div className="text-xs text-gray-500">
+                                  (Now: {item.current_product_name})
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-900">
+                              Rs. {parseFloat(item.original_price || item.price).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-900">
+                              Rs. {parseFloat(item.price).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-900">
+                              {item.quantity}
+                            </td>
+                            <td className="px-4 py-2 text-sm">
+                              {item.discount_amount && parseFloat(item.discount_amount) > 0 ? (
+                                <span className="text-green-600 font-medium">
+                                  -Rs. {parseFloat(item.discount_amount).toLocaleString()}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">No discount</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-900 font-medium">
+                              Rs. {parseFloat(item.subtotal).toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    
+                    {/* Order Summary */}
+                    <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+                      <div className="space-y-2 text-sm">
+                        {orderDetails.total_original_amount > orderDetails.total_amount && (
+                          <>
+                            <div className="flex justify-between">
+                              <span>Original Amount:</span>
+                              <span>Rs. {parseFloat(orderDetails.total_original_amount).toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between text-green-600 font-medium">
+                              <span>Total Discount:</span>
+                              <span>-Rs. {parseFloat(orderDetails.total_discount_amount || 0).toLocaleString()}</span>
+                            </div>
+                            <hr className="my-2" />
+                          </>
+                        )}
+                        <div className="flex justify-between font-bold text-lg">
+                          <span>Final Amount:</span>
+                          <span>Rs. {parseFloat(orderDetails.total_amount).toLocaleString()}</span>
+                        </div>
+                        {orderDetails.total_savings > 0 && (
+                          <div className="text-green-600 text-sm font-medium">
+                            Customer saved Rs. {parseFloat(orderDetails.total_savings).toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No items found for this order.</p>
+                )}
               </div>
 
               <div className="mt-6">

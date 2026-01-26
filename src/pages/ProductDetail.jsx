@@ -191,9 +191,37 @@ function ProductDetail() {
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
                   {product.name}
                 </h1>
-                <p className="text-3xl font-bold text-orange-600">
-                  {formatPrice(product.price)}
-                </p>
+                
+                {/* Price Section with Discount */}
+                <div className="flex items-center space-x-3 mb-2">
+                  {product.has_active_discount && product.discount_amount > 0 ? (
+                    <>
+                      {/* Discounted Price */}
+                      <p className="text-3xl font-bold text-green-600">
+                        {formatPrice(product.final_price || product.price)}
+                      </p>
+                      {/* Original Price (crossed out) */}
+                      <p className="text-xl text-gray-500 line-through">
+                        {formatPrice(product.original_price || product.price)}
+                      </p>
+                      {/* Discount Badge */}
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        -{product.discount_percentage}% OFF
+                      </span>
+                    </>
+                  ) : (
+                    <p className="text-3xl font-bold text-orange-600">
+                      {formatPrice(product.price)}
+                    </p>
+                  )}
+                </div>
+                
+                {/* Savings Display */}
+                {product.has_active_discount && product.savings > 0 && (
+                  <p className="text-green-600 font-medium text-lg">
+                    You save {formatPrice(product.savings)}!
+                  </p>
+                )}
               </div>
 
               <div className="border-t border-gray-200 pt-6">

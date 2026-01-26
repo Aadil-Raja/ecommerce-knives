@@ -356,11 +356,76 @@ def delete_category(category_id):
 def get_orders():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM orders ORDER BY created_at DESC')
+    
+    # Get orders with discount information
+    cur.execute('''
+        SELECT o.*, 
+               COALESCE(SUM(oi.discount_amount), 0) as total_discount
+        FROM orders o
+        LEFT JOIN order_items oi ON o.id = oi.order_id
+        GROUP BY o.id
+        ORDER BY o.created_at DESC
+    ''')
+    
     orders = cur.fetchall()
     cur.close()
     conn.close()
     return jsonify(orders)
+
+@admin_bp.route('/orders/<int:order_id>', methods=['GET'])
+@admin_required
+def get_order_details(order_id):
+    """Get detailed order information including items with discount tracking"""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        # Get order details
+        cur.execute('SELECT * FROM orders WHERE id = %s', (order_id,))
+        order = cur.fetchone()
+        
+        if not order:
+            return jsonify({'error': 'Order not found'}), 404
+        
+        # Get order items with discount information
+        cur.execute('''
+            SELECT oi.*, p.name as current_product_name
+            FROM order_items oi
+            LEFT JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id = %s
+            ORDER BY oi.id
+        ''', (order_id,))
+        
+        items = cur.fetchall()
+        
+        # Calculate totals
+        total_original_amount = 0
+        total_discount_amount = 0
+        
+        for item in items:
+            if item['original_price']:
+                total_original_amount += float(item['original_price']) * item['quantity']
+            else:
+                total_original_amount += float(item['price']) * item['quantity']
+            
+            if item['discount_amount']:
+                total_discount_amount += float(item['discount_amount'])
+        
+        order_dict = dict(order)
+        order_dict['items'] = items
+        order_dict['total_original_amount'] = total_original_amount
+        order_dict['total_discount_amount'] = total_discount_amount
+        order_dict['total_savings'] = total_discount_amount
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify(order_dict)
+        
+    except Exception as e:
+        cur.close()
+        conn.close()
+        return jsonify({'error': str(e)}), 500
 
 @admin_bp.route('/orders/<int:order_id>/status', methods=['PUT'])
 @admin_required

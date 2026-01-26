@@ -28,6 +28,7 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminNewsletter from './pages/admin/AdminNewsletter';
+import AdminDiscounts from './pages/admin/AdminDiscounts';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
               <Route path="orders" element={<AdminOrders />} />
               <Route path="banners" element={<AdminBanners />} />
               <Route path="newsletter" element={<AdminNewsletter />} />
+              <Route path="discounts" element={<AdminDiscounts />} />
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
             </Route>
             
