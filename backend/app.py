@@ -9,6 +9,7 @@ from routes.orders import orders_bp
 from routes.admin import admin_bp
 from routes.banners import banners_bp
 from routes.newsletter import newsletter_bp
+from routes.gallery import gallery_bp
 from database.seeder import initialize_database
 
 load_dotenv()
@@ -32,6 +33,7 @@ app.register_blueprint(orders_bp, url_prefix='/api/orders')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(banners_bp, url_prefix='/api/banners')
 app.register_blueprint(newsletter_bp, url_prefix='/api/newsletter')
+app.register_blueprint(gallery_bp, url_prefix='/api/gallery')
 
 @app.route('/')
 def home():

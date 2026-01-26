@@ -116,6 +116,20 @@ def initialize_database():
             );
         """)
         
+        # Create Gallery Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS gallery (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(200) NOT NULL,
+                image_name VARCHAR(255) NOT NULL UNIQUE,
+                alt_text VARCHAR(255),
+                is_active BOOLEAN DEFAULT TRUE,
+                display_order INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        
         # Create indexes for better performance
         indexes = [
             "CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);",
@@ -130,7 +144,10 @@ def initialize_database():
             "CREATE INDEX IF NOT EXISTS idx_product_images_main ON product_images(is_main);",
             "CREATE INDEX IF NOT EXISTS idx_product_images_order ON product_images(display_order);",
             "CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers(email);",
-            "CREATE INDEX IF NOT EXISTS idx_newsletter_active ON newsletter_subscribers(is_active);"
+            "CREATE INDEX IF NOT EXISTS idx_newsletter_active ON newsletter_subscribers(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_gallery_active ON gallery(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_gallery_order ON gallery(display_order);",
+            "CREATE INDEX IF NOT EXISTS idx_gallery_image_name ON gallery(image_name);"
         ]
         
         for index_sql in indexes:

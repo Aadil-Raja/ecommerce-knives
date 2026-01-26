@@ -12,8 +12,9 @@ const AdminLayout = () => {
     { name: 'Products', href: '/admin/products', icon: '📦' },
     { name: 'Featured Products', href: '/admin/featured-products', icon: '⭐' },
     { name: 'Categories', href: '/admin/categories', icon: '📂' },
+    { name: 'Gallery', href: '/admin/gallery', icon: '🖼️' },
     { name: 'Orders', href: '/admin/orders', icon: '🛒' },
-    { name: 'Banners', href: '/admin/banners', icon: '🖼️' },
+    { name: 'Banners', href: '/admin/banners', icon: '🎨' },
     { name: 'Newsletter', href: '/admin/newsletter', icon: '📧' },
   ];
 

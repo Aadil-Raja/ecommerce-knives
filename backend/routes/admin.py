@@ -49,6 +49,8 @@ def check_auth():
     
     if 'admin_logged_in' in session:
         return jsonify({'authenticated': True, 'email': session.get('admin_email')})
+    else:
+        return jsonify({'authenticated': False})
 
 # Dashboard Stats
 @admin_bp.route('/dashboard', methods=['GET'])

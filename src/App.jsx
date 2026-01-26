@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Category from './pages/Category';
 import ProductDetail from './pages/ProductDetail';
+import Gallery from './pages/Gallery';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
@@ -21,6 +22,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductImages from './pages/admin/AdminProductImages';
+import AdminGallery from './pages/admin/AdminGallery';
 import AdminFeaturedProducts from './pages/admin/AdminFeaturedProducts';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -39,6 +41,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="/category/:categoryName" element={<Category />} />
             <Route path="/product/:productId" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
@@ -60,6 +63,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="products/:productId/images" element={<AdminProductImages />} />
+              <Route path="gallery" element={<AdminGallery />} />
               <Route path="featured-products" element={<AdminFeaturedProducts />} />
               <Route path="categories" element={<AdminCategories />} />
               <Route path="orders" element={<AdminOrders />} />

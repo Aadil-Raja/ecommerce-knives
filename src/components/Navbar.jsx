@@ -76,6 +76,10 @@ function Navbar() {
                 About Us
               </Link>
 
+              <Link to="/gallery" className="text-gray-700 hover:text-gray-900 transition-colors text-sm uppercase tracking-wider">
+                Gallery
+              </Link>
+
               {/* Cart Icon */}
               <Link to="/cart" className="relative text-gray-700 hover:text-gray-900 transition-colors">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,6 +181,14 @@ function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               About Us
+            </Link>
+
+            <Link
+              to="/gallery"
+              className="block py-2 text-gray-700 hover:text-gray-900 transition-colors text-sm uppercase tracking-wider"
+              onClick={() => setIsOpen(false)}
+            >
+              Gallery
             </Link>
           </div>
         )}

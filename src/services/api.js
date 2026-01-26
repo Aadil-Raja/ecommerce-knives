@@ -59,4 +59,10 @@ export const api = {
     if (!imagePath) return null;
     return `${BACKEND_BASE_URL}/${imagePath}`;
   },
+
+  // Gallery
+  getGalleryImages: async () => {
+    const response = await fetch(`${API_BASE_URL}/gallery`);
+    return response.json();
+  },
 };

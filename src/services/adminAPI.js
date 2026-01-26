@@ -268,6 +268,43 @@ class AdminAPI {
   async getNewsletterStats() {
     return this.request('/admin/newsletter/stats');
   }
+
+  // Gallery Management
+  async getGalleryImages() {
+    return this.request('/gallery/admin');
+  }
+
+  async createGalleryImage(formData) {
+    const response = await fetch(`${API_BASE_URL}/gallery/admin`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData, // FormData object
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Upload failed');
+    }
+
+    return response.json();
+  }
+
+  async updateGalleryImage(id, data) {
+    return this.request(`/gallery/admin/${id}`, {
+      method: 'PUT',
+      body: data,
+    });
+  }
+
+  async deleteGalleryImage(id) {
+    return this.request(`/gallery/admin/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async checkGalleryImageName(filename) {
+    return this.request(`/gallery/admin/check-name/${encodeURIComponent(filename)}`);
+  }
 }
 
 export const adminAPI = new AdminAPI();

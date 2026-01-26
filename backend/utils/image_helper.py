@@ -122,6 +122,20 @@ def save_uploaded_image(file, filename, category_name=None, product_name=None, b
         # Return path relative to static folder
         relative_path = f"product_images/{secure_filename(category_name)}/{secure_filename(barcode)}/{new_filename}"
         
+    elif image_type == 'gallery':
+        # Create folder: gallery/
+        folder_path = static_path / 'gallery'
+        folder_path.mkdir(parents=True, exist_ok=True)
+        
+        # Use the provided filename for gallery images
+        new_filename = secure_filename(filename)
+        
+        # Full path for saving
+        file_path = folder_path / new_filename
+        
+        # Return path relative to static folder
+        relative_path = f"gallery/{new_filename}"
+        
     else:
         # Fallback to simple filename with UUID
         new_filename = f"{uuid.uuid4()}.{file_extension}"
