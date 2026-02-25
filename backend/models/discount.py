@@ -3,6 +3,34 @@ from datetime import datetime
 
 class Discount:
     @staticmethod
+    def get_active_discounts_batch(product_ids):
+        """Batch fetch active discounts for multiple products in ONE query - OPTIMIZED"""
+        if not product_ids:
+            return {}
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Use IN clause to fetch all active discounts at once
+        placeholders = ','.join(['%s'] * len(product_ids))
+        cur.execute(f'''
+            SELECT DISTINCT ON (product_id) 
+                product_id, discount_percentage, created_at, is_active
+            FROM discounts
+            WHERE product_id IN ({placeholders})
+            AND is_active = TRUE
+            ORDER BY product_id, created_at DESC
+        ''', product_ids)
+        
+        discounts = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        # Create a map of product_id -> discount
+        discounts_map = {disc['product_id']: disc for disc in discounts}
+        return discounts_map
+
+    @staticmethod
     def create_discount(product_id, discount_percentage, created_by='admin'):
         """Create a new discount for a product"""
         conn = get_db_connection()

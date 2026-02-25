@@ -2,6 +2,33 @@ from config.database import get_db_connection
 
 class ProductImage:
     @staticmethod
+    def get_main_images_batch(product_ids):
+        """Batch fetch main images for multiple products in ONE query - OPTIMIZED"""
+        if not product_ids:
+            return {}
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Use IN clause to fetch all main images at once
+        placeholders = ','.join(['%s'] * len(product_ids))
+        cur.execute(f'''
+            SELECT DISTINCT ON (product_id) 
+                product_id, image_name, is_main, display_order
+            FROM product_images 
+            WHERE product_id IN ({placeholders})
+            ORDER BY product_id, is_main DESC, display_order ASC, created_at ASC
+        ''', product_ids)
+        
+        images = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        # Create a map of product_id -> main_image
+        images_map = {img['product_id']: img for img in images}
+        return images_map
+
+    @staticmethod
     def get_by_product_id(product_id):
         conn = get_db_connection()
         cur = conn.cursor()

@@ -58,22 +58,53 @@ class Product:
     
     @staticmethod
     def _add_main_image_to_products(products):
-        """Add only main image information to a list of product dicts for listings"""
+        """Add only main image information to a list of product dicts for listings - OPTIMIZED"""
+        if not products:
+            return []
+        
+        # Extract product IDs
+        product_ids = [p['id'] for p in products]
+        
+        # Batch fetch all discounts in ONE query
+        from models.discount import Discount
+        discounts_map = Discount.get_active_discounts_batch(product_ids)
+        
+        # Batch fetch all main images in ONE query
+        images_map = ProductImage.get_main_images_batch(product_ids)
+        
         products_with_images = []
         for p in products:
             product = dict(p)
-            # Add discount info first
-            product = Product._add_discount_info_to_product(product)
+            product_id = product['id']
             
-            # Get only the main image for listings
-            product_images = ProductImage.get_by_product_id(product['id'])
+            # Add discount info from batch-fetched data
+            discount = discounts_map.get(product_id)
+            if discount:
+                original_price = float(product['price'])
+                discount_percentage = float(discount['discount_percentage'])
+                discount_amount = original_price * (discount_percentage / 100)
+                final_price = round(original_price - discount_amount, 2)
+                
+                product['has_active_discount'] = True
+                product['original_price'] = original_price
+                product['final_price'] = final_price
+                product['discount_amount'] = round(discount_amount, 2)
+                product['savings'] = round(discount_amount, 2)
+                product['discount_percentage'] = discount_percentage
+            else:
+                product['has_active_discount'] = False
+                product['original_price'] = float(product['price'])
+                product['final_price'] = float(product['price'])
+                product['discount_amount'] = 0
+                product['savings'] = 0
+                product['discount_percentage'] = 0
             
-            if product_images:
-                main_image = next((img for img in product_images if img['is_main']), product_images[0] if product_images else None)
-                product['main_image'] = main_image['image_name'] if main_image else None
-                # Only include products that have at least one valid image
-                if product['main_image']:
-                    products_with_images.append(product)
+            # Add main image from batch-fetched data
+            main_image = images_map.get(product_id)
+            if main_image:
+                product['main_image'] = main_image['image_name']
+                products_with_images.append(product)
+        
         return products_with_images
     
     @staticmethod
