@@ -5,9 +5,12 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Only scroll to top if NOT navigating back to home
-    // (let Home component handle its own scroll restoration)
-    if (pathname !== '/' && pathname !== '/home') {
+    // Only scroll to top if NOT navigating back to home or category pages
+    // (let those components handle their own scroll restoration)
+    const isHomePage = pathname === '/' || pathname === '/home';
+    const isCategoryPage = pathname.startsWith('/category/');
+    
+    if (!isHomePage && !isCategoryPage) {
       window.scrollTo(0, 0);
     }
   }, [pathname]);

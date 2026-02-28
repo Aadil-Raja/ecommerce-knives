@@ -59,7 +59,7 @@ function Home() {
   // Restore scroll position after render
   useEffect(() => {
     if (isCached && imagesLoaded) {
-      const savedPosition = getScrollPosition();
+      const savedPosition = getScrollPosition('/');
       console.log('🔄 Restoring scroll position:', savedPosition);
       if (savedPosition > 0) {
         // Multiple attempts to ensure scroll restoration

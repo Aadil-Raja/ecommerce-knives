@@ -6,8 +6,9 @@ export function HomePageProvider({ children }) {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [banners, setBanners] = useState([]);
   const [cachedProducts, setCachedProducts] = useState({}); // Store products by ID
+  const [cachedCategories, setCachedCategories] = useState({}); // Store category data by slug+page
   const [isCached, setIsCached] = useState(false);
-  const scrollPositionRef = useRef(0);
+  const scrollPositions = useRef({}); // Store scroll positions by route
 
   const cacheFeaturedProducts = (products) => {
     setFeaturedProducts(products);
@@ -29,20 +30,34 @@ export function HomePageProvider({ children }) {
     return cachedProducts[productId];
   };
 
-  const saveScrollPosition = (position) => {
-    scrollPositionRef.current = position;
+  const cacheCategory = (categorySlug, page, data) => {
+    const key = `${categorySlug}_page_${page}`;
+    setCachedCategories(prev => ({
+      ...prev,
+      [key]: data
+    }));
   };
 
-  const getScrollPosition = () => {
-    return scrollPositionRef.current;
+  const getCachedCategory = (categorySlug, page) => {
+    const key = `${categorySlug}_page_${page}`;
+    return cachedCategories[key];
+  };
+
+  const saveScrollPosition = (route, position) => {
+    scrollPositions.current[route] = position;
+  };
+
+  const getScrollPosition = (route) => {
+    return scrollPositions.current[route] || 0;
   };
 
   const clearCache = () => {
     setFeaturedProducts([]);
     setBanners([]);
     setCachedProducts({});
+    setCachedCategories({});
     setIsCached(false);
-    scrollPositionRef.current = 0;
+    scrollPositions.current = {};
   };
 
   return (
@@ -55,6 +70,8 @@ export function HomePageProvider({ children }) {
         cacheBanners,
         cacheProduct,
         getCachedProduct,
+        cacheCategory,
+        getCachedCategory,
         saveScrollPosition,
         getScrollPosition,
         clearCache,

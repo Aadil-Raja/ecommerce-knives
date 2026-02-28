@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getImageUrl, formatPrice } from '../utils/config';
 import { useHomePage } from '../context/HomePageContext';
 
 const ProductCard = ({ product }) => {
+  const location = useLocation();
   const { saveScrollPosition } = useHomePage();
   const hasDiscount = product.has_active_discount && product.discount_amount > 0;
   
@@ -13,10 +14,11 @@ const ProductCard = ({ product }) => {
   const savings = product.savings || product.discount_amount || 0;
 
   const handleClick = () => {
-    // Save scroll position when clicking product
+    // Save scroll position for current route when clicking product
     const currentScroll = window.scrollY || window.pageYOffset;
-    console.log('🔗 Product clicked - Saving scroll position:', currentScroll);
-    saveScrollPosition(currentScroll);
+    const currentRoute = location.pathname + location.search;
+    console.log('🔗 Product clicked from:', currentRoute, '- Saving scroll:', currentScroll);
+    saveScrollPosition(currentRoute, currentScroll);
   };
 
   return (

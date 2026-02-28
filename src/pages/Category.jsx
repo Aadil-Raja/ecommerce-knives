@@ -1,4 +1,4 @@
-import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -6,19 +6,26 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import ProductCard from '../components/ProductCard';
 import { api } from '../services/api';
 import { getImageUrl, formatPrice, debugLog, PRODUCTS_PER_PAGE } from '../utils/config';
+import { useHomePage } from '../context/HomePageContext';
 
 function Category() {
   const { categoryName } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [category, setCategory] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [pagination, setPagination] = useState(null);
+  const location = useLocation();
+  const { cacheCategory, getCachedCategory, getScrollPosition } = useHomePage();
   
   // Get current page from URL, default to 1
   const currentPage = parseInt(searchParams.get('page')) || 1;
+  
+  // Check cache first
+  const cachedData = getCachedCategory(categoryName, currentPage);
+  
+  const [category, setCategory] = useState(cachedData?.category || null);
+  const [products, setProducts] = useState(cachedData?.products || []);
+  const [loading, setLoading] = useState(!cachedData);
+  const [imagesLoaded, setImagesLoaded] = useState(!!cachedData);
+  const [pagination, setPagination] = useState(cachedData?.pagination || null);
 
   // Function to properly format category name
   const formatCategoryName = (slug) => {
@@ -54,46 +61,77 @@ function Category() {
     console.log('🔍 DEBUG: categoryName from URL:', categoryName);
     console.log('🔍 DEBUG: formatted name:', formatCategoryName(categoryName));
     
-    // Immediately clear old data when category or page changes
-    setCategory(null);
-    setProducts([]);
-    setLoading(true);
-    setImagesLoaded(false);
-    setPagination(null);
-    
-    const fetchData = async () => {
-      try {
-        const data = await api.getCategoryBySlug(categoryName, currentPage, PRODUCTS_PER_PAGE);
-        
-        debugLog('🚀 FRONTEND: Received paginated category products');
-        debugLog('📂 FRONTEND: Category:', data.category);
-        debugLog('📄 FRONTEND: Current page:', currentPage);
-        debugLog('📊 FRONTEND: Number of products received:', data.products.length);
-        debugLog('📄 FRONTEND: Pagination info:', data.pagination);
-        debugLog('📦 FRONTEND: Full category response:', data);
-        
-        if (data.products.length > 0) {
-          debugLog('🔑 FRONTEND: Fields in each product:', Object.keys(data.products[0]));
-          debugLog('📋 FRONTEND: Sample product:', data.products[0]);
+    // Only fetch if not cached
+    if (!cachedData) {
+      // Clear old data when category or page changes
+      setCategory(null);
+      setProducts([]);
+      setLoading(true);
+      setImagesLoaded(false);
+      setPagination(null);
+      
+      const fetchData = async () => {
+        try {
+          const data = await api.getCategoryBySlug(categoryName, currentPage, PRODUCTS_PER_PAGE);
+          
+          debugLog('🚀 FRONTEND: Received paginated category products');
+          debugLog('📂 FRONTEND: Category:', data.category);
+          debugLog('📄 FRONTEND: Current page:', currentPage);
+          debugLog('📊 FRONTEND: Number of products received:', data.products.length);
+          debugLog('📄 FRONTEND: Pagination info:', data.pagination);
+          debugLog('📦 FRONTEND: Full category response:', data);
+          
+          if (data.products.length > 0) {
+            debugLog('🔑 FRONTEND: Fields in each product:', Object.keys(data.products[0]));
+            debugLog('📋 FRONTEND: Sample product:', data.products[0]);
+          }
+          
+          debugLog('📏 FRONTEND: Products payload size (approx):', JSON.stringify(data.products).length, 'characters');
+          debugLog('📏 FRONTEND: Total payload size (approx):', JSON.stringify(data).length, 'characters');
+          
+          setCategory(data.category);
+          setProducts(data.products);
+          setPagination(data.pagination);
+          cacheCategory(categoryName, currentPage, data); // Cache for future visits
+          setImagesLoaded(true);
+        } catch (error) {
+          console.error('Error fetching products:', error);
+          setImagesLoaded(true);
+        } finally {
+          setLoading(false);
         }
-        
-        debugLog('📏 FRONTEND: Products payload size (approx):', JSON.stringify(data.products).length, 'characters');
-        debugLog('📏 FRONTEND: Total payload size (approx):', JSON.stringify(data).length, 'characters');
-        
-        setCategory(data.category);
-        setProducts(data.products);
-        setPagination(data.pagination);
-        setImagesLoaded(true); // Show content immediately, let images load lazily
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        setImagesLoaded(true);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchData();
-  }, [categoryName, currentPage]);
+      fetchData();
+    } else {
+      // Use cached data
+      setCategory(cachedData.category);
+      setProducts(cachedData.products);
+      setPagination(cachedData.pagination);
+      setLoading(false);
+      setImagesLoaded(true);
+    }
+  }, [categoryName, currentPage, cachedData, cacheCategory]);
+
+  // Restore scroll position after render
+  useEffect(() => {
+    if (imagesLoaded && cachedData) {
+      const currentRoute = location.pathname + location.search;
+      const savedPosition = getScrollPosition(currentRoute);
+      console.log('🔄 Restoring category scroll:', savedPosition, 'for route:', currentRoute);
+      if (savedPosition > 0) {
+        const restoreScroll = () => {
+          window.scrollTo(0, savedPosition);
+          console.log('✅ Scrolled to:', savedPosition);
+        };
+        
+        restoreScroll();
+        setTimeout(restoreScroll, 0);
+        setTimeout(restoreScroll, 50);
+        setTimeout(restoreScroll, 100);
+      }
+    }
+  }, [imagesLoaded, cachedData, location, getScrollPosition]);
 
   const goToPage = (page) => {
     if (page === 1) {
