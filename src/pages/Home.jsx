@@ -1,44 +1,83 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BannerSlider from '../components/BannerSlider';
 import WhatsAppButton from '../components/WhatsAppButton';
 import ProductCard from '../components/ProductCard';
 import { api } from '../services/api';
-import { getImageUrl, formatPrice, debugLog } from '../utils/config';
+import { debugLog } from '../utils/config';
+import { useHomePage } from '../context/HomePageContext';
 
 function Home() {
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const { 
+    featuredProducts: cachedProducts, 
+    isCached, 
+    cacheFeaturedProducts,
+    saveScrollPosition,
+    getScrollPosition 
+  } = useHomePage();
+  
+  const [featuredProducts, setFeaturedProducts] = useState(cachedProducts);
+  const [imagesLoaded, setImagesLoaded] = useState(isCached);
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        const featuredProducts = await api.getFeaturedProducts();
-        
-        debugLog('🚀 FRONTEND: Received ONLY featured products from backend');
-        debugLog('📊 FRONTEND: Number of featured products received:', featuredProducts.length);
-        debugLog('📦 FRONTEND: Featured products data:', featuredProducts);
-        
-        if (featuredProducts.length > 0) {
-          debugLog('🔑 FRONTEND: Fields in each product:', Object.keys(featuredProducts[0]));
-          debugLog('📋 FRONTEND: Sample featured product:', featuredProducts[0]);
+    // Only fetch if not cached
+    if (!isCached) {
+      const fetchFeaturedProducts = async () => {
+        try {
+          const products = await api.getFeaturedProducts();
+          
+          debugLog('🚀 FRONTEND: Received ONLY featured products from backend');
+          debugLog('📊 FRONTEND: Number of featured products received:', products.length);
+          debugLog('📦 FRONTEND: Featured products data:', products);
+          
+          if (products.length > 0) {
+            debugLog('🔑 FRONTEND: Fields in each product:', Object.keys(products[0]));
+            debugLog('📋 FRONTEND: Sample featured product:', products[0]);
+          }
+          
+          debugLog('📏 FRONTEND: Payload size (approx):', JSON.stringify(products).length, 'characters');
+          debugLog('✅ FRONTEND: No filtering needed - backend sent only featured products!');
+          
+          setFeaturedProducts(products);
+          cacheFeaturedProducts(products); // Cache for future visits
+          setImagesLoaded(true);
+        } catch (error) {
+          console.error('Error fetching featured products:', error);
+          setImagesLoaded(true);
         }
-        
-        debugLog('📏 FRONTEND: Payload size (approx):', JSON.stringify(featuredProducts).length, 'characters');
-        debugLog('✅ FRONTEND: No filtering needed - backend sent only featured products!');
-        
-        setFeaturedProducts(featuredProducts);
-        setImagesLoaded(true); // Show content immediately, let images load lazily
-      } catch (error) {
-        console.error('Error fetching featured products:', error);
-        setImagesLoaded(true);
-      }
-    };
+      };
 
-    fetchFeaturedProducts();
-  }, []);
+      fetchFeaturedProducts();
+    } else {
+      // Use cached data
+      setFeaturedProducts(cachedProducts);
+      setImagesLoaded(true);
+    }
+  }, [isCached, cachedProducts, cacheFeaturedProducts]);
+
+  // Restore scroll position after render
+  useEffect(() => {
+    if (isCached && imagesLoaded) {
+      const savedPosition = getScrollPosition();
+      console.log('🔄 Restoring scroll position:', savedPosition);
+      if (savedPosition > 0) {
+        // Multiple attempts to ensure scroll restoration
+        const restoreScroll = () => {
+          window.scrollTo(0, savedPosition);
+          console.log('✅ Scrolled to:', savedPosition, 'Current:', window.scrollY);
+        };
+
+        // Immediate attempt
+        restoreScroll();
+        
+        // Backup attempts with delays
+        setTimeout(restoreScroll, 0);
+        setTimeout(restoreScroll, 50);
+        setTimeout(restoreScroll, 100);
+      }
+    }
+  }, [isCached, imagesLoaded, getScrollPosition]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

@@ -5,14 +5,18 @@ import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useHomePage } from '../context/HomePageContext';
 import { getImageUrl, formatPrice, debugLog } from '../utils/config';
 
 function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const { cacheProduct, getCachedProduct } = useHomePage();
+  const cachedProduct = getCachedProduct(productId);
+  
+  const [product, setProduct] = useState(cachedProduct || null);
+  const [loading, setLoading] = useState(!cachedProduct);
+  const [imagesLoaded, setImagesLoaded] = useState(!!cachedProduct);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -20,41 +24,50 @@ function ProductDetail() {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const data = await api.getProductById(productId);
-        debugLog('Product data received:', data);
-        debugLog('Specifications:', data.specifications);
-        debugLog('Specifications type:', typeof data.specifications);
-        setProduct(data);
-        
-        // Preload all images
-        const imagesToLoad = data.gallery_images && data.gallery_images.length > 0 
-          ? data.gallery_images.map(img => img.image_name)
-          : data.all_images && data.all_images.length > 0 
-          ? data.all_images 
-          : [data.main_image || data.image_name];
-        
-        const imagePromises = imagesToLoad.map(imgPath => {
-          return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve();
-            img.onerror = () => resolve(); // Resolve even on error to not block loading
-            img.src = getImageUrl(imgPath);
+    // Only fetch if not cached
+    if (!cachedProduct) {
+      const fetchProduct = async () => {
+        try {
+          const data = await api.getProductById(productId);
+          debugLog('Product data received:', data);
+          debugLog('Specifications:', data.specifications);
+          debugLog('Specifications type:', typeof data.specifications);
+          setProduct(data);
+          cacheProduct(productId, data); // Cache for future visits
+          
+          // Preload all images
+          const imagesToLoad = data.gallery_images && data.gallery_images.length > 0 
+            ? data.gallery_images.map(img => img.image_name)
+            : data.all_images && data.all_images.length > 0 
+            ? data.all_images 
+            : [data.main_image || data.image_name];
+          
+          const imagePromises = imagesToLoad.map(imgPath => {
+            return new Promise((resolve) => {
+              const img = new Image();
+              img.onload = () => resolve();
+              img.onerror = () => resolve(); // Resolve even on error to not block loading
+              img.src = getImageUrl(imgPath);
+            });
           });
-        });
-        
-        await Promise.all(imagePromises);
-        setImagesLoaded(true);
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          
+          await Promise.all(imagePromises);
+          setImagesLoaded(true);
+        } catch (error) {
+          console.error('Error fetching product:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchProduct();
-  }, [productId]);
+      fetchProduct();
+    } else {
+      // Use cached product
+      setProduct(cachedProduct);
+      setLoading(false);
+      setImagesLoaded(true);
+    }
+  }, [productId, cachedProduct, cacheProduct]);
 
   if (loading || !imagesLoaded) {
     return (

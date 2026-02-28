@@ -5,7 +5,11 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Only scroll to top if NOT navigating back to home
+    // (let Home component handle its own scroll restoration)
+    if (pathname !== '/' && pathname !== '/home') {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   return null;

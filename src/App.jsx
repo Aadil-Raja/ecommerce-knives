@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AdminProvider } from './context/AdminContext';
+import { HomePageProvider } from './context/HomePageContext';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -35,9 +36,10 @@ function App() {
   return (
     <CartProvider>
       <AdminProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
+        <HomePageProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
@@ -77,8 +79,9 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
-      </AdminProvider>
-    </CartProvider>
+      </HomePageProvider>
+    </AdminProvider>
+  </CartProvider>
   );
 }
 

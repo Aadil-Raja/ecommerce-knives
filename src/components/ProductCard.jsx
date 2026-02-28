@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getImageUrl, formatPrice } from '../utils/config';
+import { useHomePage } from '../context/HomePageContext';
 
 const ProductCard = ({ product }) => {
+  const { saveScrollPosition } = useHomePage();
   const hasDiscount = product.has_active_discount && product.discount_amount > 0;
   
   // Calculate discount info if not provided by backend
@@ -10,9 +12,16 @@ const ProductCard = ({ product }) => {
   const finalPrice = product.final_price || product.price;
   const savings = product.savings || product.discount_amount || 0;
 
+  const handleClick = () => {
+    // Save scroll position when clicking product
+    const currentScroll = window.scrollY || window.pageYOffset;
+    console.log('🔗 Product clicked - Saving scroll position:', currentScroll);
+    saveScrollPosition(currentScroll);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/product/${product.id}`} onClick={handleClick}>
         <div className="relative">
           {/* Product Image */}
           <div className="aspect-w-1 aspect-h-1 w-full h-64 bg-gray-200">

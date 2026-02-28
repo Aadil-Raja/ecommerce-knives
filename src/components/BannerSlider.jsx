@@ -1,24 +1,34 @@
 import { useState, useEffect } from 'react';
 import { getBackendUrl, getImageUrl } from '../utils/config';
+import { useHomePage } from '../context/HomePageContext';
 
 function BannerSlider() {
+  const { banners: cachedBanners, isCached, cacheBanners } = useHomePage();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [banners, setBanners] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [banners, setBanners] = useState(cachedBanners);
+  const [loading, setLoading] = useState(!isCached);
 
   useEffect(() => {
-    loadBanners();
-  }, []);
+    // Only fetch if not cached
+    if (!isCached) {
+      loadBanners();
+    } else {
+      // Use cached banners
+      setBanners(cachedBanners);
+      setLoading(false);
+    }
+  }, [isCached, cachedBanners]);
 
   const loadBanners = async () => {
     try {
       const response = await fetch(`${getBackendUrl()}/banners/`);
       const data = await response.json();
       setBanners(data);
+      cacheBanners(data); // Cache for future visits
     } catch (error) {
       console.error('Failed to load banners:', error);
       // Fallback to default banners
-      setBanners([
+      const fallbackBanners = [
         {
           id: 1,
           title: 'Sharp Lab by OWAIS',
@@ -31,7 +41,9 @@ function BannerSlider() {
           subtitle: 'Premium Knives. Crafted for Precision.',
           image_name: 'desktop_banner/Untitled-2.jpg'
         }
-      ]);
+      ];
+      setBanners(fallbackBanners);
+      cacheBanners(fallbackBanners);
     } finally {
       setLoading(false);
     }
